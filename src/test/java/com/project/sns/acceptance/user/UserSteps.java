@@ -1,0 +1,46 @@
+package com.project.sns.acceptance.user;
+
+import io.restassured.RestAssured;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
+import java.util.HashMap;
+import java.util.Map;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+
+public class UserSteps {
+
+    public static ExtractableResponse<Response> 베어러_인증_로그인_요청(String email, String password) {
+        Map<String, String> params = new HashMap<>();
+        params.put("email", email);
+        params.put("password", password);
+
+        return RestAssured.given().log().all()
+                .contentType(APPLICATION_JSON_VALUE)
+                .body(params)
+                .when().post("/users/login")
+                .then().log().all().extract();
+    }
+
+    public static String 베어러_인증_응답에서_AccessToken_가져오기(ExtractableResponse<Response> response) {
+        return response.jsonPath().getString("accessToken");
+    }
+
+    public static ExtractableResponse<Response> 회원_가입_요청(int age, String email, String password, String userName, String nickName, String address, String profileMessage, String profileImage) {
+        Map<String, String> params = new HashMap<>();
+        params.put("age", age + "");
+        params.put("email", email);
+        params.put("password", password);
+        params.put("userName", userName);
+        params.put("nickName", nickName);
+        params.put("address", address);
+        params.put("profileMessage", profileMessage);
+        params.put("profileImage", profileImage);
+
+        return RestAssured
+                .given().log().all()
+                .contentType(APPLICATION_JSON_VALUE)
+                .body(params)
+                .when().post("/users/signup")
+                .then().log().all().extract();
+    }
+}
