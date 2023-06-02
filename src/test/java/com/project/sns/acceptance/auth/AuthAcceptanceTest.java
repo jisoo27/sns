@@ -18,7 +18,7 @@ class AuthAcceptanceTest extends AcceptanceTest {
     @Test
     void joinTest() {
 
-        var response = 회원_가입_요청(22, EMAIL, PASSWORD, "admin", "admmin", "경기도 수원시", "안녕", "/");
+        var response = 회원가입_요청(22, EMAIL, PASSWORD, "admin", "admmin", "경기도 수원시", "안녕", "/");
 
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(CREATED.value())
@@ -29,9 +29,9 @@ class AuthAcceptanceTest extends AcceptanceTest {
     @Test
     void joinExceptionTest() {
 
-        회원_가입_요청(22, EMAIL, PASSWORD, "admin", "admmin", "경기도 수원시", "안녕", "/");
+        회원가입_요청(22, EMAIL, PASSWORD, "admin", "admmin", "경기도 수원시", "안녕", "/");
 
-        var response = 회원_가입_요청(20, EMAIL, PASSWORD, "admin", "admmin", "경기도 수원시", "안녕", "/");
+        var response = 회원가입_요청(20, EMAIL, PASSWORD, "admin", "admmin", "경기도 수원시", "안녕", "/");
 
         assertThat(response.statusCode()).isEqualTo(CONFLICT.value());
     }
