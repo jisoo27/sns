@@ -36,4 +36,38 @@ class AuthAcceptanceTest extends AcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(CONFLICT.value());
     }
 
+    @DisplayName("로그인을 할 수 있다.")
+    @Test
+    void loginTest() {
+
+        회원가입_요청(22, EMAIL, PASSWORD, "admin", "admmin", "경기도 수원시", "안녕", "/");
+
+        var response = 베어러_인증_로그인_요청(EMAIL, PASSWORD);
+
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(OK.value()),
+                () -> assertThat(베어러_인증_응답에서_token_가져오기(response)).isNotBlank()
+        );
+    }
+
+    @DisplayName("회원가입을 하지 않은 경우에는 로그인에 실패한다.")
+    @Test
+    void loginExceptionTest() {
+
+        var response = 베어러_인증_로그인_요청(EMAIL, PASSWORD);
+
+        assertThat(response.statusCode()).isEqualTo(NOT_FOUND.value());
+    }
+
+    @DisplayName("로그인 시 틀린 비밀번호를 입력할 경우 로그인에 실패한다.")
+    @Test
+    void loginExceptionTest2() {
+
+        회원가입_요청(22, EMAIL, PASSWORD, "admin", "admmin", "경기도 수원시", "안녕", "/");
+
+        var response = 베어러_인증_로그인_요청(EMAIL, "wrong_password");
+
+        assertThat(response.statusCode()).isEqualTo(UNAUTHORIZED.value());
+    }
+
 }

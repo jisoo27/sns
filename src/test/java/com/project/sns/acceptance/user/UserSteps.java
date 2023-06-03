@@ -17,15 +17,15 @@ public class UserSteps {
         return RestAssured.given().log().all()
                 .contentType(APPLICATION_JSON_VALUE)
                 .body(params)
-                .when().post("/users/login")
+                .when().post("/api/users/login")
                 .then().log().all().extract();
     }
 
-    public static String 베어러_인증_응답에서_AccessToken_가져오기(ExtractableResponse<Response> response) {
-        return response.jsonPath().getString("accessToken");
+    public static String 베어러_인증_응답에서_token_가져오기(ExtractableResponse<Response> response) {
+        return response.jsonPath().getString("token");
     }
 
-    public static ExtractableResponse<Response> 회원_가입_요청(int age, String email, String password, String userName, String nickName, String address, String profileMessage, String profileImage) {
+    public static ExtractableResponse<Response> 회원가입_요청(int age, String email, String password, String userName, String nickName, String address, String profileMessage, String profileImage) {
         Map<String, String> params = new HashMap<>();
         params.put("age", age + "");
         params.put("email", email);
@@ -40,7 +40,7 @@ public class UserSteps {
                 .given().log().all()
                 .contentType(APPLICATION_JSON_VALUE)
                 .body(params)
-                .when().post("/users/signup")
+                .when().post("/api/users/signup")
                 .then().log().all().extract();
     }
 }
