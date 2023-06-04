@@ -1,5 +1,6 @@
 package com.project.sns.unit.service;
 
+import com.project.sns.exception.ErrorCode;
 import com.project.sns.exception.SnsApplicationException;
 import com.project.sns.fixture.UserFixture;
 import com.project.sns.user.controller.dto.request.UserJoinRequest;
@@ -13,8 +14,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import java.util.Optional;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -63,6 +65,41 @@ class AuthServiceTest {
         when(encoder.encode(USER_JOIN_REQUEST.getPassword())).thenReturn("encrypt_password");
         when(userRepository.save(any())).thenReturn(Optional.of(mock(User.class)));
 
-        assertThatThrownBy(() -> userService.join(USER_JOIN_REQUEST)).isInstanceOf(SnsApplicationException.class);
+        SnsApplicationException e = assertThrows(SnsApplicationException.class, () -> userService.join(USER_JOIN_REQUEST));
+        assertThat(e.getErrorCode()).isEqualTo(ErrorCode.DUPLICATED_USER_EMAIL);
+    }
+
+    @Test
+    @DisplayName("로그인이 정상적으로 동작하는 경우")
+    void loginTest() {
+
+        User fixture = UserFixture.get(USER_JOIN_REQUEST);
+
+        when(userRepository.findByEmail(USER_JOIN_REQUEST.getEmail())).thenReturn(Optional.of(fixture));
+        when(encoder.matches(USER_JOIN_REQUEST.getPassword(), fixture.getPassword())).thenReturn(true);
+
+        assertDoesNotThrow(() -> userService.login(USER_JOIN_REQUEST.getEmail(), USER_JOIN_REQUEST.getPassword()));
+    }
+
+    @Test
+    @DisplayName("로그인 시 해당 이메일로 회원가입한 유저가 없는 경우")
+    void loginExceptionTest() {
+
+        when(userRepository.findByEmail(USER_JOIN_REQUEST.getEmail())).thenReturn(Optional.empty());
+
+        SnsApplicationException e = assertThrows(SnsApplicationException.class, () -> userService.login(USER_JOIN_REQUEST.getEmail(), USER_JOIN_REQUEST.getPassword()));
+        assertThat(e.getErrorCode()).isEqualTo(ErrorCode.USER_NOT_FOUND);
+    }
+
+    @Test
+    @DisplayName("로그인 시 비밀번호가 틀린 경우")
+    void loginExceptionTest2() {
+
+        User fixture = UserFixture.get(USER_JOIN_REQUEST);
+
+        when(userRepository.findByEmail(USER_JOIN_REQUEST.getEmail())).thenReturn(Optional.of(fixture));
+
+        SnsApplicationException e = assertThrows(SnsApplicationException.class, () -> userService.login(USER_JOIN_REQUEST.getEmail(), "wrong_password"));
+        assertThat(e.getErrorCode()).isEqualTo(ErrorCode.INVALID_PASSWORD);
     }
 }
