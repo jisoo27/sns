@@ -8,4 +8,8 @@ import lombok.Getter;
 public class UserLoginResponse {
 
     private String token;
+
+    public static UserLoginResponse of(String token) {
+        return new UserLoginResponse(token);
+    }
 }

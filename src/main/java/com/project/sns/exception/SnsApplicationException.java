@@ -12,6 +12,6 @@ public class SnsApplicationException extends RuntimeException{
 
     public SnsApplicationException(ErrorCode errorCode) {
         this.errorCode = errorCode;
-        this.message = null;
+        this.message = errorCode.getMessage();
     }
 }

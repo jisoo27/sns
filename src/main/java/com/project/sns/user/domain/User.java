@@ -1,7 +1,7 @@
 package com.project.sns.user.domain;
 
 import com.project.sns.audit.Auditable;
-import com.project.sns.user.controller.dto.request.UserJoinRequest;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,6 +15,8 @@ import static lombok.AccessLevel.PROTECTED;
 @Getter
 @SQLDelete(sql = "UPDATE users SET delete_at = NOW() where id = ?")
 @Where(clause = "delete_at is NULL")
+@AllArgsConstructor
+@Builder
 @NoArgsConstructor(access = PROTECTED)
 public class User extends Auditable {
 
@@ -40,7 +42,7 @@ public class User extends Auditable {
 
     @Column(name = "role")
     @Enumerated(EnumType.STRING)
-    private UserRole role = UserRole.USER;
+    private final UserRole role = UserRole.USER;
 
 //    @ManyToOne
 //    private Post post;
@@ -48,28 +50,16 @@ public class User extends Auditable {
 //    @ManyToOne
 //    private Like like;
 
-    @Builder
-    public User(int age, String email, String password, String userName, String nickName, String address, String profileMessage, String profileImage) {
-        this.age = age;
-        this.email = email;
-        this.password = password;
-        this.userName = userName;
-        this.nickName = nickName;
-        this.address = address;
-        this.profileMessage = profileMessage;
-        this.profileImage = profileImage;
-    }
-
-    public static User of (UserJoinRequest userJoinRequest) {
+    public static User of (int age, String email, String password, String userName, String nickName, String address, String profileMessage, String profileImage) {
         return User.builder()
-                .age(userJoinRequest.getAge())
-                .email(userJoinRequest.getEmail())
-                .password(userJoinRequest.getPassword())
-                .userName(userJoinRequest.getUserName())
-                .nickName(userJoinRequest.getNickName())
-                .address(userJoinRequest.getAddress())
-                .profileMessage(userJoinRequest.getProfileMessage())
-                .profileImage(userJoinRequest.getProfileImage())
+                .age(age)
+                .email(email)
+                .password(password)
+                .userName(userName)
+                .nickName(nickName)
+                .address(address)
+                .profileMessage(profileMessage)
+                .profileImage(profileImage)
                 .build();
     }
 

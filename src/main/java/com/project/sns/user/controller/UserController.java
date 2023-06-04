@@ -1,6 +1,7 @@
 package com.project.sns.user.controller;
 
 import com.project.sns.user.controller.dto.request.UserJoinRequest;
+import com.project.sns.user.controller.dto.request.UserLoginRequest;
 import com.project.sns.user.controller.dto.response.UserJoinResponse;
 import com.project.sns.user.controller.dto.response.UserLoginResponse;
 import com.project.sns.user.service.UserService;
@@ -14,20 +15,21 @@ import java.net.URI;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/users")
+@RequestMapping("/api/users")
 public class UserController {
 
     private final UserService userService;
 
     @PostMapping("/signup")
-    public ResponseEntity<UserJoinResponse> join(@RequestBody UserJoinRequest userJoinRequest) {
-        UserJoinResponse response = userService.join(userJoinRequest);
+    public ResponseEntity<UserJoinResponse> join(@RequestBody UserJoinRequest request) {
+        // TODO: 컨트롤러에서 받는 요청 dto 를 그대로 service layer 에 보내지 말것.
+        UserJoinResponse response = userService.join(request);
         return ResponseEntity.created(URI.create("/users/" + response.getId())).body(response);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UserLoginResponse> login() {
-        UserLoginResponse response = userService.login();
+    public ResponseEntity<UserLoginResponse> login(@RequestBody UserLoginRequest request) {
+        UserLoginResponse response = userService.login(request.getEmail(), request.getPassword());
         return ResponseEntity.ok().body(response);
     }
 }
