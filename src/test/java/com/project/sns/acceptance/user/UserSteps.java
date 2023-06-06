@@ -43,4 +43,14 @@ public class UserSteps {
                 .when().post("/api/users/signup")
                 .then().log().all().extract();
     }
+
+    public static ExtractableResponse<Response> 토큰_인증으로_내_회원정보_조회_요청(String token) {
+        return RestAssured.given().log().all()
+                .headers("Authorization",
+                        "Bearer " +
+                        token)
+                .accept(APPLICATION_JSON_VALUE)
+                .when().get("/api/users/my")
+                .then().log().all().extract();
+    }
 }
