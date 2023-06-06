@@ -5,6 +5,7 @@ import com.project.sns.exception.SnsApplicationException;
 import com.project.sns.user.controller.dto.request.UserJoinRequest;
 import com.project.sns.user.controller.dto.response.UserJoinResponse;
 import com.project.sns.user.controller.dto.response.UserLoginResponse;
+import com.project.sns.user.controller.dto.response.UserResponse;
 import com.project.sns.user.domain.User;
 import com.project.sns.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -47,5 +48,14 @@ public class UserService {
         String token = JwtTokenUtils.generateToken(email, secretKey, expiredTimeMs);
         return UserLoginResponse.of(token);
 
+    }
+
+    public UserResponse getMyInformation(String email) {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new SnsApplicationException(USER_NOT_FOUND));
+        return UserResponse.of(user);
+    }
+
+    public User loadUserByEmail(String email) {
+        return userRepository.findByEmail(email).orElseThrow(() -> new SnsApplicationException(USER_NOT_FOUND));
     }
 }

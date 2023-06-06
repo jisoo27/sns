@@ -4,13 +4,12 @@ import com.project.sns.user.controller.dto.request.UserJoinRequest;
 import com.project.sns.user.controller.dto.request.UserLoginRequest;
 import com.project.sns.user.controller.dto.response.UserJoinResponse;
 import com.project.sns.user.controller.dto.response.UserLoginResponse;
+import com.project.sns.user.controller.dto.response.UserResponse;
 import com.project.sns.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 
 @RestController
@@ -31,5 +30,11 @@ public class UserController {
     public ResponseEntity<UserLoginResponse> login(@RequestBody UserLoginRequest request) {
         UserLoginResponse response = userService.login(request.getEmail(), request.getPassword());
         return ResponseEntity.ok().body(response);
+    }
+
+    @GetMapping("/my")
+    public ResponseEntity<UserResponse> getMyInformation(Authentication authentication) {
+        UserResponse userResponse = userService.getMyInformation(authentication.getName());
+        return ResponseEntity.ok().body(userResponse);
     }
 }
