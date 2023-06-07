@@ -1,4 +1,4 @@
-package com.project.sns.unit.service;
+package com.project.sns.unit.service.auth;
 
 import com.project.sns.exception.ErrorCode;
 import com.project.sns.exception.SnsApplicationException;
