@@ -1,6 +1,7 @@
 package com.project.sns.unit.service.user;
 
 import com.project.sns.exception.SnsApplicationException;
+import com.project.sns.user.controller.dto.request.UserEditInfoRequest;
 import com.project.sns.user.domain.User;
 import com.project.sns.user.repository.UserRepository;
 import com.project.sns.user.service.UserService;
@@ -26,25 +27,40 @@ class UserServiceTest {
     @MockBean
     private UserRepository userRepository;
 
+    private final String EMAIL = "admin@email.com";
+
 
     @Test
     @DisplayName("로그인한 회원이 자신의 정보를 조회하는 경우")
     void getMyInfoTest() {
 
-        String email = "admin@email.com";
-
-        when(userRepository.findByEmail(email)).thenReturn(Optional.of(mock(User.class)));
-        assertDoesNotThrow(() -> userService.getMyInformation(email));
+        when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(mock(User.class)));
+        assertDoesNotThrow(() -> userService.getMyInformation(EMAIL));
     }
 
     @Test
     @DisplayName("존재하지 않는 유저가 자신의 정보를 조회할 경우")
     void getMyInfoExceptionTest() {
 
-        String email = "admin@email.com";
+        when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.empty());
+        SnsApplicationException e = assertThrows(SnsApplicationException.class, () -> userService.getMyInformation(EMAIL));
+        assertThat(e.getErrorCode()).isEqualTo(USER_NOT_FOUND);
+    }
 
-        when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
-        SnsApplicationException e = assertThrows(SnsApplicationException.class, () -> userService.getMyInformation(email));
+    @Test
+    @DisplayName("로그인한 회원이 자신의 정보를 수정하는 경우")
+    void editMyInfoTest() {
+
+        when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(mock(User.class)));
+        assertDoesNotThrow(() -> userService.editMyInformation(EMAIL, new UserEditInfoRequest("hi", "//", "sona")));
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 유저가 자신의 정보를 수정할 경우")
+    void editMyInfoExceptionTest() {
+
+        when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.empty());
+        SnsApplicationException e = assertThrows(SnsApplicationException.class, () -> userService.editMyInformation(EMAIL, new UserEditInfoRequest("hi", "//", "sona")));
         assertThat(e.getErrorCode()).isEqualTo(USER_NOT_FOUND);
     }
 
