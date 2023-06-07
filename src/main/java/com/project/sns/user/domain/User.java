@@ -60,6 +60,13 @@ public class User extends Auditable implements UserDetails {
     private List<Like> likes = new ArrayList<>();
 
 
+    public void editInfo(String profileMessage, String profileImage, String nickName) {
+        this.profileMessage = profileMessage;
+        this.profileImage = profileImage;
+        this.nickName = nickName;
+    }
+
+
     public static User of (int age, String email, String password, String userName, String nickName, String address, String profileMessage, String profileImage) {
         return User.builder()
                 .age(age)

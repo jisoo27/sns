@@ -2,6 +2,7 @@ package com.project.sns.user.service;
 
 import com.project.sns.configuration.JwtTokenUtils;
 import com.project.sns.exception.SnsApplicationException;
+import com.project.sns.user.controller.dto.request.UserEditInfoRequest;
 import com.project.sns.user.controller.dto.request.UserJoinRequest;
 import com.project.sns.user.controller.dto.response.UserJoinResponse;
 import com.project.sns.user.controller.dto.response.UserLoginResponse;
@@ -12,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import static com.project.sns.exception.ErrorCode.*;
 
 @Service
@@ -27,6 +30,7 @@ public class UserService {
     @Value("${jwt.token.expired-time-ms}")
     private Long expiredTimeMs;
 
+    @Transactional
     public UserJoinResponse join(UserJoinRequest userJoinRequest) {
 
         userRepository.findByEmail(userJoinRequest.getEmail()).ifPresent(it -> {
@@ -57,5 +61,12 @@ public class UserService {
 
     public User loadUserByEmail(String email) {
         return userRepository.findByEmail(email).orElseThrow(() -> new SnsApplicationException(USER_NOT_FOUND));
+    }
+
+    @Transactional
+    public UserResponse editMyInformation(String email, UserEditInfoRequest request) {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new SnsApplicationException(USER_NOT_FOUND));
+        user.editInfo(request.getProfileMessage(), request.getProfileImage(), request.getNickName());
+        return UserResponse.of(user);
     }
 }

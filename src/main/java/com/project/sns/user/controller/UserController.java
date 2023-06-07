@@ -1,5 +1,6 @@
 package com.project.sns.user.controller;
 
+import com.project.sns.user.controller.dto.request.UserEditInfoRequest;
 import com.project.sns.user.controller.dto.request.UserJoinRequest;
 import com.project.sns.user.controller.dto.request.UserLoginRequest;
 import com.project.sns.user.controller.dto.response.UserJoinResponse;
@@ -35,6 +36,12 @@ public class UserController {
     @GetMapping("/my")
     public ResponseEntity<UserResponse> getMyInformation(Authentication authentication) {
         UserResponse userResponse = userService.getMyInformation(authentication.getName());
+        return ResponseEntity.ok().body(userResponse);
+    }
+
+    @PatchMapping("/my")
+    public ResponseEntity<UserResponse> editMyInformation(Authentication authentication, @RequestBody UserEditInfoRequest request) {
+        UserResponse userResponse = userService.editMyInformation(authentication.getName(), request);
         return ResponseEntity.ok().body(userResponse);
     }
 }
