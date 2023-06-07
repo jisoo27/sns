@@ -53,4 +53,20 @@ public class UserSteps {
                 .when().get("/api/users/my")
                 .then().log().all().extract();
     }
+
+    public static ExtractableResponse<Response> 토큰_인증으로_내_회원정보_수정_요청(String token, String profileMessage, String profileImage, String nickName) {
+        Map<String, String> params = new HashMap<>();
+        params.put("profileMessage", profileMessage + "");
+        params.put("profileImage", profileImage);
+        params.put("nickName", nickName);
+
+        return RestAssured.given().log().all()
+                .headers("Authorization",
+                        "Bearer " +
+                                token)
+                .contentType(APPLICATION_JSON_VALUE)
+                .body(params)
+                .when().patch("/api/users/my")
+                .then().log().all().extract();
+    }
 }
