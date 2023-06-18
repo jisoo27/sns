@@ -22,4 +22,18 @@ public class PostSteps {
                 .when().post("/api/posts")
                 .then().log().all().extract();
     }
+
+    public static ExtractableResponse<Response> 게시물_수정_요청(String token, String content, Long postId) {
+        Map<String, String> params = new HashMap<>();
+        params.put("content", content);
+
+        return RestAssured.given().log().all()
+                .headers("Authorization",
+                        "Bearer " +
+                                token)
+                .contentType(APPLICATION_JSON_VALUE)
+                .body(params)
+                .when().patch("/api/posts/{postId}", postId)
+                .then().log().all().extract();
+    }
 }
