@@ -1,15 +1,16 @@
 package com.project.sns.post.controller;
 
 import com.project.sns.post.controller.dto.request.PostCreateRequest;
+import com.project.sns.post.controller.dto.request.PostEditRequest;
+import com.project.sns.post.controller.dto.response.PostEditResponse;
 import com.project.sns.post.controller.dto.response.PostResponse;
 import com.project.sns.post.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.net.URI;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,8 +21,14 @@ public class PostController {
 
     @PostMapping
     public ResponseEntity<PostResponse> create(@RequestBody PostCreateRequest request, Authentication authentication) {
-        PostResponse postResponse = postService.create(request.getImageRequests(), request.getContent(), authentication.getName());
-        return ResponseEntity.ok().body(postResponse);
+        PostResponse response = postService.create(request.getImageRequests(), request.getContent(), authentication.getName());
+        return ResponseEntity.created(URI.create("/api/posts/" + response.getId())).body(response);
+    }
+
+    @PatchMapping("/{postId}")
+    public ResponseEntity<PostEditResponse> edit(@PathVariable Long postId, @RequestBody PostEditRequest request, Authentication authentication) {
+        PostEditResponse response = postService.edit(request.getContent(), authentication.getName(), postId);
+        return ResponseEntity.ok().body(response);
     }
 
 }

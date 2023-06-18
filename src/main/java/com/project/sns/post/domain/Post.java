@@ -35,4 +35,12 @@ public class Post extends Auditable {
         this.user = user;
     }
 
+    public boolean notCheckUser(User user) {
+        return this.getUser() != user;
+    }
+
+    public void edit(String content) {
+        this.content = content;
+    }
+
 }

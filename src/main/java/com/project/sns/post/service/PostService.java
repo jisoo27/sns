@@ -1,10 +1,12 @@
 package com.project.sns.post.service;
 
+import com.project.sns.exception.ErrorCode;
 import com.project.sns.exception.SnsApplicationException;
 import com.project.sns.image.domain.Image;
 import com.project.sns.image.dto.ImageRequest;
 import com.project.sns.image.dto.ImageResponse;
 import com.project.sns.image.repository.ImageRepository;
+import com.project.sns.post.controller.dto.response.PostEditResponse;
 import com.project.sns.post.controller.dto.response.PostResponse;
 import com.project.sns.post.domain.Post;
 import com.project.sns.post.repository.PostRepository;
@@ -15,7 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
-import static com.project.sns.exception.ErrorCode.USER_NOT_FOUND;
+
+import static com.project.sns.exception.ErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -39,4 +42,16 @@ public class PostService {
         return PostResponse.of(post, imageResponses);
     }
 
+    @Transactional
+    public PostEditResponse edit(String content, String email, Long postId) {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new SnsApplicationException(USER_NOT_FOUND));
+        Post post = postRepository.findById(postId).orElseThrow(() -> new SnsApplicationException(POST_NOT_FOUND));
+
+        if (post.notCheckUser(user)) {
+            throw new SnsApplicationException(INVALID_PERMISSION);
+        }
+
+        post.edit(content);
+        return PostEditResponse.of(post);
+    }
 }
