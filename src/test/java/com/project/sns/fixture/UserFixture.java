@@ -18,4 +18,12 @@ public class UserFixture {
                 .profileImage(userJoinRequest.getProfileImage())
                 .build();
     }
+
+    public static User get(String email, String password, Long userId) {
+        return User.builder()
+                .id(userId)
+                .email(email)
+                .password(password)
+                .build();
+    }
 }
