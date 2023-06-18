@@ -1,8 +1,6 @@
 package com.project.sns.post.domain;
 
-import com.project.sns.Image.domain.Image;
 import com.project.sns.audit.Auditable;
-import com.project.sns.tag.domain.PostTag;
 import com.project.sns.user.domain.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,8 +9,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 import static javax.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
@@ -34,9 +30,9 @@ public class Post extends Auditable {
     @ManyToOne
     private User user;
 
-    @OneToMany(mappedBy = "post")
-    private List<Image> images = new ArrayList<>();
+    public Post(String content, User user) {
+        this.content = content;
+        this.user = user;
+    }
 
-    @OneToMany(mappedBy = "tag")
-    private List<PostTag> postTags = new ArrayList<>();
 }
