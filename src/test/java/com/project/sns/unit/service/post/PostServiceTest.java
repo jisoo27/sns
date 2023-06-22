@@ -11,16 +11,21 @@ import com.project.sns.post.repository.PostRepository;
 import com.project.sns.post.service.PostService;
 import com.project.sns.user.domain.User;
 import com.project.sns.user.repository.UserRepository;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import static com.project.sns.exception.ErrorCode.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -133,6 +138,20 @@ class PostServiceTest {
 
         SnsApplicationException e = assertThrows(SnsApplicationException.class, () -> postService.edit(content, email, postId));
         assertThat(e.getErrorCode()).isEqualTo(INVALID_PERMISSION);
+    }
+
+
+    @DisplayName("자신이 쓴 게시물 조회에 성공할 경우")
+    @Test
+    void getMyPostListTest() {
+
+        Pageable pageable = mock(Pageable.class);
+        User user = mock(User.class);
+
+        when(userRepository.findByEmail(any())).thenReturn(Optional.of(user));
+        when(postRepository.findAllByUser(user, pageable)).thenReturn(Page.empty());
+
+        assertDoesNotThrow(() -> postService.getMyList(user.getEmail(), pageable));
     }
 
 }
