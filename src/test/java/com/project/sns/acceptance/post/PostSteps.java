@@ -36,4 +36,14 @@ public class PostSteps {
                 .when().patch("/api/posts/{postId}", postId)
                 .then().log().all().extract();
     }
+
+    public static ExtractableResponse<Response> 나의_게시물_조회_요청(String token) {
+        return RestAssured.given().log().all()
+                .headers("Authorization",
+                        "Bearer " +
+                                token)
+                .contentType(APPLICATION_JSON_VALUE)
+                .when().get("/api/posts")
+                .then().log().all().extract();
+    }
 }
