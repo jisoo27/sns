@@ -4,8 +4,11 @@ import com.project.sns.post.controller.dto.request.PostCreateRequest;
 import com.project.sns.post.controller.dto.request.PostEditRequest;
 import com.project.sns.post.controller.dto.response.PostEditResponse;
 import com.project.sns.post.controller.dto.response.PostResponse;
+import com.project.sns.post.domain.Post;
 import com.project.sns.post.service.PostService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +32,12 @@ public class PostController {
     public ResponseEntity<PostEditResponse> edit(@PathVariable Long postId, @RequestBody PostEditRequest request, Authentication authentication) {
         PostEditResponse response = postService.edit(request.getContent(), authentication.getName(), postId);
         return ResponseEntity.ok().body(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<PostResponse>> getMyList(Pageable pageable, Authentication authentication) {
+        Page<PostResponse> myList = postService.getMyList(authentication.getName(), pageable);
+        return ResponseEntity.ok().body(myList);
     }
 
 }
