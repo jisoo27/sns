@@ -4,7 +4,6 @@ import com.project.sns.exception.SnsApplicationException;
 import com.project.sns.fixture.PostFixture;
 import com.project.sns.fixture.UserFixture;
 import com.project.sns.image.domain.Image;
-import com.project.sns.image.dto.ImageRequest;
 import com.project.sns.image.repository.ImageRepository;
 import com.project.sns.post.domain.Post;
 import com.project.sns.post.repository.PostRepository;
@@ -53,14 +52,14 @@ class PostServiceTest {
 
         String email = "admin@email.com";
         String content = "내용이다";
-        List<ImageRequest> imageRequests = new ArrayList<>();
-        imageRequests.add(new ImageRequest("//"));
+        List<String> imagePaths = new ArrayList<>();
+        imagePaths.add("//");
 
         when(userRepository.findByEmail(email)).thenReturn(Optional.of(mock(User.class)));
         when(imageRepository.save(any())).thenReturn(mock(Image.class));
         when(postRepository.save(any())).thenReturn(mock(Post.class));
 
-        assertDoesNotThrow(() -> postService.create(imageRequests, content, email));
+        assertDoesNotThrow(() -> postService.create(imagePaths, content, email));
     }
 
     @DisplayName("게시글 등록한 유저가 없는 경우")
@@ -69,14 +68,14 @@ class PostServiceTest {
 
         String email = "admin@email.com";
         String content = "내용이다";
-        List<ImageRequest> imageRequests = new ArrayList<>();
-        imageRequests.add(new ImageRequest("//"));
+        List<String> imagePaths = new ArrayList<>();
+        imagePaths.add("//");
 
         when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
         when(imageRepository.save(any())).thenReturn(mock(Image.class));
         when(postRepository.save(any())).thenReturn(mock(Post.class));
 
-        SnsApplicationException e = assertThrows(SnsApplicationException.class, () -> postService.create(imageRequests, content, email));
+        SnsApplicationException e = assertThrows(SnsApplicationException.class, () -> postService.create(imagePaths, content, email));
         assertThat(e.getErrorCode()).isEqualTo(USER_NOT_FOUND);
     }
 
@@ -86,8 +85,8 @@ class PostServiceTest {
 
         String email = "admin@email.com";
         String content = "수정된 내용이다.";
-        List<ImageRequest> imageRequests = new ArrayList<>();
-        imageRequests.add(new ImageRequest("//"));
+        List<String> imagePaths = new ArrayList<>();
+        imagePaths.add("//");
         Long postId = 1L;
 
         Post post = PostFixture.get(email, postId, 1L);
@@ -106,8 +105,8 @@ class PostServiceTest {
 
         String email = "admin@email.com";
         String content = "수정된 내용이다.";
-        List<ImageRequest> imageRequests = new ArrayList<>();
-        imageRequests.add(new ImageRequest("//"));
+        List<String> imagePaths = new ArrayList<>();
+        imagePaths.add("//");
         Long postId = 1L;
 
         Post post = PostFixture.get(email, postId, 1L);
@@ -126,8 +125,8 @@ class PostServiceTest {
 
         String email = "admin@email.com";
         String content = "수정된 내용이다.";
-        List<ImageRequest> imageRequests = new ArrayList<>();
-        imageRequests.add(new ImageRequest("//"));
+        List<String> imagePaths = new ArrayList<>();
+        imagePaths.add("//");
         Long postId = 1L;
 
         Post post = PostFixture.get(email, postId, 1L);
@@ -154,4 +153,59 @@ class PostServiceTest {
         assertDoesNotThrow(() -> postService.getMyList(user.getEmail(), pageable));
     }
 
+    @DisplayName("게시물 삭제에 성공한 경우")
+    @Test
+    void postDeleteTest() {
+
+        String email = "admin@email.com";
+        List<String> imagePaths = new ArrayList<>();
+        imagePaths.add("//");
+        Long postId = 1L;
+
+        Post post = PostFixture.get(email, postId, 1L);
+        User user = post.getUser();
+
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+        when(postRepository.findById(postId)).thenReturn(Optional.of(post));
+
+        assertDoesNotThrow(() -> postService.delete(email, postId));
+    }
+
+    @DisplayName("게시글 삭제 시 글이 존재하지 않는 경우")
+    @Test
+    void postDeleteExceptionTest() {
+
+        String email = "admin@email.com";
+        List<String> imagePaths = new ArrayList<>();
+        imagePaths.add("//");
+        Long postId = 1L;
+
+        Post post = PostFixture.get(email, postId, 1L);
+        User user = post.getUser();
+
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+        when(postRepository.findById(postId)).thenReturn(Optional.empty());
+
+        SnsApplicationException e = assertThrows(SnsApplicationException.class, () -> postService.delete(email, postId));
+        assertThat(e.getErrorCode()).isEqualTo(POST_NOT_FOUND);
+    }
+
+    @DisplayName("게시글 삭제 시 권한이 없는 경우")
+    @Test
+    void postDeleteExceptionTest2() {
+
+        String email = "admin@email.com";
+        List<String> imagePaths = new ArrayList<>();
+        imagePaths.add("//");
+        Long postId = 1L;
+
+        Post post = PostFixture.get(email, postId, 1L);
+        User user = UserFixture.get(email, "password", 2L);
+
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+        when(postRepository.findById(postId)).thenReturn(Optional.of(post));
+
+        SnsApplicationException e = assertThrows(SnsApplicationException.class, () -> postService.delete(email, postId));
+        assertThat(e.getErrorCode()).isEqualTo(INVALID_PERMISSION);
+    }
 }
