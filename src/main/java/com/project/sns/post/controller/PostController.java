@@ -4,7 +4,6 @@ import com.project.sns.post.controller.dto.request.PostCreateRequest;
 import com.project.sns.post.controller.dto.request.PostEditRequest;
 import com.project.sns.post.controller.dto.response.PostEditResponse;
 import com.project.sns.post.controller.dto.response.PostResponse;
-import com.project.sns.post.domain.Post;
 import com.project.sns.post.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -12,7 +11,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
 import java.net.URI;
 
 @RestController
@@ -24,7 +22,7 @@ public class PostController {
 
     @PostMapping
     public ResponseEntity<PostResponse> create(@RequestBody PostCreateRequest request, Authentication authentication) {
-        PostResponse response = postService.create(request.getImageRequests(), request.getContent(), authentication.getName());
+        PostResponse response = postService.create(request.getImagePaths(), request.getContent(), authentication.getName());
         return ResponseEntity.created(URI.create("/api/posts/" + response.getId())).body(response);
     }
 
@@ -38,6 +36,12 @@ public class PostController {
     public ResponseEntity<Page<PostResponse>> getMyList(Pageable pageable, Authentication authentication) {
         Page<PostResponse> myList = postService.getMyList(authentication.getName(), pageable);
         return ResponseEntity.ok().body(myList);
+    }
+
+    @DeleteMapping("/{postId}")
+    public ResponseEntity<Void> delete(@PathVariable Long postId, Authentication authentication) {
+        postService.delete(authentication.getName(), postId);
+        return ResponseEntity.noContent().build();
     }
 
 }

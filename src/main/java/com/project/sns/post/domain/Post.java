@@ -13,6 +13,9 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static javax.persistence.CascadeType.ALL;
+import static javax.persistence.CascadeType.PERSIST;
+import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
@@ -31,10 +34,10 @@ public class Post extends Auditable {
 
     private String content;
 
-    @ManyToOne
+    @ManyToOne(fetch = LAZY)
     private User user;
 
-    @OneToMany
+    @OneToMany(mappedBy = "post", cascade = ALL)
     private List<Image> images = new ArrayList<>();
 
     public Post(String content, User user) {
@@ -48,9 +51,5 @@ public class Post extends Auditable {
 
     public void edit(String content) {
         this.content = content;
-    }
-
-    public void addImage(Image image) {
-        images.add(image);
     }
 }

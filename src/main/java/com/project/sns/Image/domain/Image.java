@@ -1,24 +1,23 @@
 package com.project.sns.image.domain;
 
-import com.project.sns.image.dto.ImageRequest;
+import com.project.sns.audit.Auditable;
 import com.project.sns.post.domain.Post;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
+import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 import javax.persistence.*;
-import java.util.List;
-
 import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
+import static lombok.AccessLevel.PROTECTED;
 
-@Entity
+@Entity(name = "image")
 @Getter
-@Setter
+@SQLDelete(sql = "UPDATE image SET delete_at = NOW() where id = ?")
+@Where(clause = "delete_at is NULL")
 @AllArgsConstructor
-@NoArgsConstructor
-public class Image {
+@Builder
+@NoArgsConstructor(access = PROTECTED)
+public class Image extends Auditable {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -27,12 +26,7 @@ public class Image {
     private String imagePath;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "post_id")
     private Post post;
-
-    public Image(String imagePath) {
-        this.imagePath = imagePath;
-    }
 
     public Image(String imagePath, Post post) {
         this.imagePath = imagePath;
@@ -40,10 +34,16 @@ public class Image {
     }
 
     public static Image of (String imagePath, Post post) {
-        Image image = new Image();
-        image.setImagePath(imagePath);
-        image.setPost(post);
-        return image;
+        return new Image(imagePath, post);
     }
 
+    public void changePost(Post post) {
+        if (this.post != null) {
+            this.post.getImages().remove(this);
+        }
+        this.post = post;
+        if (!post.getImages().contains(this)) {
+            post.getImages().add(this);
+        }
+    }
 }
