@@ -46,4 +46,14 @@ public class PostSteps {
                 .when().get("/api/posts")
                 .then().log().all().extract();
     }
+
+    public static ExtractableResponse<Response> 나의_게시물_삭제_요청(String token, Long postId) {
+        return RestAssured.given().log().all()
+                .headers("Authorization",
+                        "Bearer " +
+                                token)
+                .contentType(APPLICATION_JSON_VALUE)
+                .when().delete("/api/posts/{postId}", postId)
+                .then().log().all().extract();
+    }
 }

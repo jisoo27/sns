@@ -1,12 +1,12 @@
 package com.project.sns.acceptance.post;
 
 import com.project.sns.acceptance.AcceptanceTest;
-import com.project.sns.image.dto.ImageRequest;
 import com.project.sns.post.controller.dto.request.PostCreateRequest;
+import com.project.sns.post.repository.PostRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import java.util.ArrayList;
+import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 import static com.project.sns.acceptance.post.PostSteps.*;
 import static com.project.sns.acceptance.user.UserSteps.*;
@@ -18,6 +18,9 @@ class PostAcceptanceTest extends AcceptanceTest {
 
     private static final String EMAIL = "admin@email.com";
     private static final String PASSWORD = "password";
+
+    @Autowired
+    private PostRepository postRepository;
 
     @BeforeEach
     void before() {
@@ -32,13 +35,12 @@ class PostAcceptanceTest extends AcceptanceTest {
         // given
         var 로그인_요청 = 베어러_인증_로그인_요청(EMAIL, PASSWORD);
         var 유효한_토큰 = 베어러_인증_응답에서_token_가져오기(로그인_요청);
-        List<ImageRequest> IMAGE_REQUESTS = new ArrayList<>();
-        IMAGE_REQUESTS.add(new ImageRequest("//"));
 
         // when
-        var response = 게시물_등록_요청(유효한_토큰, new PostCreateRequest(IMAGE_REQUESTS, "내용이다!"));
+        var response = 게시물_등록_요청(유효한_토큰, new PostCreateRequest(List.of("dd", "ㅇㅇ"),"내용이다!"));
 
         // then
+        System.out.println(postRepository.findAll().size());
         assertThat(response.statusCode()).isEqualTo(CREATED.value());
     }
 
@@ -48,10 +50,10 @@ class PostAcceptanceTest extends AcceptanceTest {
 
         // when
         var 유효하지_않은_토큰 = "kkkkkkkk";
-        List<ImageRequest> IMAGE_REQUESTS = new ArrayList<>();
-        var response = 게시물_등록_요청(유효하지_않은_토큰, new PostCreateRequest(IMAGE_REQUESTS, "내용이다"));
+        var response = 게시물_등록_요청(유효하지_않은_토큰, new PostCreateRequest(List.of("dd", "ㅇㅇ"), "내용이다"));
 
         // then
+        System.out.println(postRepository.findAll().size());
         assertThat(response.statusCode()).isEqualTo(UNAUTHORIZED.value());
     }
 
@@ -62,14 +64,13 @@ class PostAcceptanceTest extends AcceptanceTest {
         // given
         var 로그인_요청 = 베어러_인증_로그인_요청(EMAIL, PASSWORD);
         var 유효한_토큰 = 베어러_인증_응답에서_token_가져오기(로그인_요청);
-        List<ImageRequest> IMAGE_REQUESTS = new ArrayList<>();
-        IMAGE_REQUESTS.add(new ImageRequest("//"));
-        var 게시물_id = 게시물_등록_요청(유효한_토큰, new PostCreateRequest(IMAGE_REQUESTS, "내용이다.")).jsonPath().getLong("id");
+        var 게시물_id = 게시물_등록_요청(유효한_토큰, new PostCreateRequest(List.of("ss", "//"), "내용이다.")).jsonPath().getLong("id");
 
         // when
         var response = 게시물_수정_요청(유효한_토큰, "바뀐 내용이다.", 게시물_id);
 
         // then
+        System.out.println(postRepository.findAll().size());
         assertThat(response.statusCode()).isEqualTo(OK.value());
     }
 
@@ -80,25 +81,19 @@ class PostAcceptanceTest extends AcceptanceTest {
         // given
         var 로그인_요청 = 베어러_인증_로그인_요청(EMAIL, PASSWORD);
         var 유효한_토큰 = 베어러_인증_응답에서_token_가져오기(로그인_요청);
-        List<ImageRequest> IMAGE_REQUESTS = new ArrayList<>();
-        IMAGE_REQUESTS.add(new ImageRequest("//"));
-        게시물_등록_요청(유효한_토큰, new PostCreateRequest(IMAGE_REQUESTS, "내용이다.")).jsonPath().getLong("id");
-
-        List<ImageRequest> OTHER_IMAGE_REQUEST = new ArrayList<>();
-        OTHER_IMAGE_REQUEST.add(new ImageRequest("dd"));
-        게시물_등록_요청(유효한_토큰, new PostCreateRequest(OTHER_IMAGE_REQUEST, "두번째 내용")).jsonPath().getLong("id");
+        게시물_등록_요청(유효한_토큰, new PostCreateRequest(List.of(), "내용이다."));
+        게시물_등록_요청(유효한_토큰, new PostCreateRequest(List.of(), "두번째 내용"));
 
         // when
         var response = 나의_게시물_조회_요청(유효한_토큰);
 
         // then
+        System.out.println(postRepository.findAll().size());
         assertAll(
                 () -> assertThat(response.jsonPath().getLong("content.get(0).id")).isEqualTo(1L),
                 () -> assertThat(response.jsonPath().getString("content.get(0).content")).isEqualTo("내용이다."),
-                () -> assertThat(response.jsonPath().getString("content.get(0).imageResponses.get(0).imagePath")).isEqualTo("//"),
                 () -> assertThat(response.jsonPath().getLong("content.get(1).id")).isEqualTo(2L),
-                () -> assertThat(response.jsonPath().getString("content.get(1).content")).isEqualTo("두번째 내용"),
-                () -> assertThat(response.jsonPath().getString("content.get(1).imageResponses.get(0).imagePath")).isEqualTo("dd")
+                () -> assertThat(response.jsonPath().getString("content.get(1).content")).isEqualTo("두번째 내용")
         );
     }
 
@@ -109,19 +104,72 @@ class PostAcceptanceTest extends AcceptanceTest {
         // given
         var 로그인_요청 = 베어러_인증_로그인_요청(EMAIL, PASSWORD);
         var 유효한_토큰 = 베어러_인증_응답에서_token_가져오기(로그인_요청);
-        List<ImageRequest> IMAGE_REQUESTS = new ArrayList<>();
-        IMAGE_REQUESTS.add(new ImageRequest("//"));
-        게시물_등록_요청(유효한_토큰, new PostCreateRequest(IMAGE_REQUESTS, "내용이다.")).jsonPath().getLong("id");
-
-        List<ImageRequest> OTHER_IMAGE_REQUEST = new ArrayList<>();
-        OTHER_IMAGE_REQUEST.add(new ImageRequest("dd"));
-        게시물_등록_요청(유효한_토큰, new PostCreateRequest(OTHER_IMAGE_REQUEST, "두번째 내용")).jsonPath().getLong("id");
+        게시물_등록_요청(유효한_토큰, new PostCreateRequest(List.of("dd", "//"), "내용이다."));
+        게시물_등록_요청(유효한_토큰, new PostCreateRequest(List.of("ss", "ff"), "두번째 내용"));
 
         // when
-        var 유효하지_않은_토큰 = "kkk";
+        var 유효하지_않은_토큰 = "kkk..";
         var response = 나의_게시물_조회_요청(유효하지_않은_토큰);
 
         // then
+        System.out.println(postRepository.findAll().size());
+        assertThat(response.statusCode()).isEqualTo(UNAUTHORIZED.value());
+    }
+
+    @DisplayName("로그인이 성공한 회원은 자신이 작성한 게시물 삭제 시 성공한다.")
+    @Test
+    void postDeleteTest() {
+
+        // given
+        var 로그인_요청 = 베어러_인증_로그인_요청(EMAIL, PASSWORD);
+        var 유효한_토큰 = 베어러_인증_응답에서_token_가져오기(로그인_요청);
+        var 게시물_id = 게시물_등록_요청(유효한_토큰, new PostCreateRequest(List.of("ss", "//"), "내용이다.")).jsonPath().getLong("id");
+
+        // when
+        var response = 나의_게시물_삭제_요청(유효한_토큰, 게시물_id);
+
+        // then
+        System.out.println(postRepository.findAll().size());
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(NO_CONTENT.value())
+        );
+    }
+
+    @DisplayName("로그인에 실패한 경우 자신이 작성한 게시물 삭제 시 실패한다.")
+    @Test
+    void postDeleteExceptionTest() {
+
+        // given
+        var 로그인_요청 = 베어러_인증_로그인_요청(EMAIL, PASSWORD);
+        var 유효한_토큰 = 베어러_인증_응답에서_token_가져오기(로그인_요청);
+        var 게시물_id = 게시물_등록_요청(유효한_토큰, new PostCreateRequest(List.of("ss", "//"), "내용이다.")).jsonPath().getLong("id");
+
+        // when
+        var 유효하지_않은_토큰 = "kkk..";
+        var response = 나의_게시물_삭제_요청(유효하지_않은_토큰, 게시물_id);
+
+        // then
+        System.out.println(postRepository.findAll().size());
+        assertThat(response.statusCode()).isEqualTo(UNAUTHORIZED.value());
+    }
+
+    @DisplayName("자신이 작성한 게시물이 아닐 경우 게시물 삭제 시 실패한다.")
+    @Test
+    void postDeleteExceptionTest2() {
+
+        // given
+        var 로그인_요청 = 베어러_인증_로그인_요청(EMAIL, PASSWORD);
+        var 유효한_토큰 = 베어러_인증_응답에서_token_가져오기(로그인_요청);
+        var 게시물_id = 게시물_등록_요청(유효한_토큰, new PostCreateRequest(List.of("//", "ss"), "내용이다.")).jsonPath().getLong("id");
+
+        var 다른_로그인_요청 = 베어러_인증_로그인_요청("anotherAdmin@email.com", "kkk");
+        var 다른_유효한_토큰 = 베어러_인증_응답에서_token_가져오기(다른_로그인_요청);
+
+        // when
+        var response = 나의_게시물_삭제_요청(다른_유효한_토큰, 게시물_id);
+
+        // then
+        System.out.println(postRepository.findAll().size());
         assertThat(response.statusCode()).isEqualTo(UNAUTHORIZED.value());
     }
 
