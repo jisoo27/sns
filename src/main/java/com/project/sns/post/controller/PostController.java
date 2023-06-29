@@ -44,4 +44,10 @@ public class PostController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/{postId}/likes")
+    public ResponseEntity<Void> like(@PathVariable Long postId, Authentication authentication) {
+        postService.like(authentication.getName(), postId);
+        return ResponseEntity.ok().build();
+    }
+
 }

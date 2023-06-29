@@ -2,6 +2,8 @@ package com.project.sns.post.service;
 
 import com.project.sns.exception.SnsApplicationException;
 import com.project.sns.image.domain.Image;
+import com.project.sns.like.domain.Like;
+import com.project.sns.like.repository.LikeRepository;
 import com.project.sns.post.controller.dto.response.PostEditResponse;
 import com.project.sns.post.controller.dto.response.PostResponse;
 import com.project.sns.post.domain.Post;
@@ -22,6 +24,7 @@ public class PostService {
 
     private final UserRepository userRepository;
     private final PostRepository postRepository;
+    private final LikeRepository likeRepository;
 
     @Transactional
     public PostResponse create(List<String> imagePaths, String content, String email) {
@@ -59,5 +62,19 @@ public class PostService {
             throw new SnsApplicationException(INVALID_PERMISSION);
         }
         postRepository.delete(post);
+    }
+
+    @Transactional
+    public void like(String email, Long postId) {
+
+        Post post = postRepository.findById(postId).orElseThrow(() -> new SnsApplicationException(POST_NOT_FOUND));
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new SnsApplicationException(USER_NOT_FOUND));
+
+        likeRepository.findByUserAndPost(user, post).ifPresent(
+                it -> {
+                    throw new SnsApplicationException(ALREADY_LIKED);
+                }
+        );
+        likeRepository.save(Like.of(user, post));
     }
 }
