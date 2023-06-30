@@ -5,12 +5,12 @@ import com.project.sns.fixture.PostFixture;
 import com.project.sns.fixture.UserFixture;
 import com.project.sns.image.domain.Image;
 import com.project.sns.image.repository.ImageRepository;
+import com.project.sns.like.repository.LikeRepository;
 import com.project.sns.post.domain.Post;
 import com.project.sns.post.repository.PostRepository;
 import com.project.sns.post.service.PostService;
 import com.project.sns.user.domain.User;
 import com.project.sns.user.repository.UserRepository;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,13 +18,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import static com.project.sns.exception.ErrorCode.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -46,20 +43,21 @@ class PostServiceTest {
     @MockBean
     private ImageRepository imageRepository;
 
+    @MockBean
+    private LikeRepository likeRepository;
+
     @DisplayName("게시글 등록이 성공한 경우")
     @Test
     void postSaveTest() {
 
         String email = "admin@email.com";
         String content = "내용이다";
-        List<String> imagePaths = new ArrayList<>();
-        imagePaths.add("//");
 
         when(userRepository.findByEmail(email)).thenReturn(Optional.of(mock(User.class)));
         when(imageRepository.save(any())).thenReturn(mock(Image.class));
         when(postRepository.save(any())).thenReturn(mock(Post.class));
 
-        assertDoesNotThrow(() -> postService.create(imagePaths, content, email));
+        assertDoesNotThrow(() -> postService.create(List.of("//"), content, email));
     }
 
     @DisplayName("게시글 등록한 유저가 없는 경우")
@@ -68,14 +66,12 @@ class PostServiceTest {
 
         String email = "admin@email.com";
         String content = "내용이다";
-        List<String> imagePaths = new ArrayList<>();
-        imagePaths.add("//");
 
         when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
         when(imageRepository.save(any())).thenReturn(mock(Image.class));
         when(postRepository.save(any())).thenReturn(mock(Post.class));
 
-        SnsApplicationException e = assertThrows(SnsApplicationException.class, () -> postService.create(imagePaths, content, email));
+        SnsApplicationException e = assertThrows(SnsApplicationException.class, () -> postService.create(List.of("//"), content, email));
         assertThat(e.getErrorCode()).isEqualTo(USER_NOT_FOUND);
     }
 
@@ -85,8 +81,6 @@ class PostServiceTest {
 
         String email = "admin@email.com";
         String content = "수정된 내용이다.";
-        List<String> imagePaths = new ArrayList<>();
-        imagePaths.add("//");
         Long postId = 1L;
 
         Post post = PostFixture.get(email, postId, 1L);
@@ -105,8 +99,6 @@ class PostServiceTest {
 
         String email = "admin@email.com";
         String content = "수정된 내용이다.";
-        List<String> imagePaths = new ArrayList<>();
-        imagePaths.add("//");
         Long postId = 1L;
 
         Post post = PostFixture.get(email, postId, 1L);
@@ -125,8 +117,6 @@ class PostServiceTest {
 
         String email = "admin@email.com";
         String content = "수정된 내용이다.";
-        List<String> imagePaths = new ArrayList<>();
-        imagePaths.add("//");
         Long postId = 1L;
 
         Post post = PostFixture.get(email, postId, 1L);
@@ -158,8 +148,6 @@ class PostServiceTest {
     void postDeleteTest() {
 
         String email = "admin@email.com";
-        List<String> imagePaths = new ArrayList<>();
-        imagePaths.add("//");
         Long postId = 1L;
 
         Post post = PostFixture.get(email, postId, 1L);
@@ -176,8 +164,6 @@ class PostServiceTest {
     void postDeleteExceptionTest() {
 
         String email = "admin@email.com";
-        List<String> imagePaths = new ArrayList<>();
-        imagePaths.add("//");
         Long postId = 1L;
 
         Post post = PostFixture.get(email, postId, 1L);
@@ -195,8 +181,6 @@ class PostServiceTest {
     void postDeleteExceptionTest2() {
 
         String email = "admin@email.com";
-        List<String> imagePaths = new ArrayList<>();
-        imagePaths.add("//");
         Long postId = 1L;
 
         Post post = PostFixture.get(email, postId, 1L);
@@ -208,4 +192,48 @@ class PostServiceTest {
         SnsApplicationException e = assertThrows(SnsApplicationException.class, () -> postService.delete(email, postId));
         assertThat(e.getErrorCode()).isEqualTo(INVALID_PERMISSION);
     }
+
+    // TODO : 좋아요 서비스 테스트 추가하기
+    @DisplayName("좋아요 요청 시 성공한 경우")
+    @Test
+    void postLikeTest() {
+
+        String email = "admin@email.com";
+        Long postId = 1L;
+
+        Post post = PostFixture.get(email, postId, 1L);
+        User user = post.getUser();
+
+        String anotherEmail = "somin@email.com";
+        User anotherUser = UserFixture.get(anotherEmail, "kkk", 2L);
+
+
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+        when(postRepository.findById(postId)).thenReturn(Optional.of(post));
+        when(userRepository.findByEmail(anotherEmail)).thenReturn(Optional.of(anotherUser));
+
+        assertDoesNotThrow(() -> postService.like(anotherEmail, postId));
+    }
+
+    @DisplayName("좋아요 요청 시 글이 존재하지 않는 경우")
+    @Test
+    void postLikeExceptionTest() {
+
+        String email = "admin@email.com";
+        Long postId = 1L;
+
+        Post post = PostFixture.get(email, postId, 1L);
+        User user = post.getUser();
+
+        String anotherEmail = "somin@email.com";
+        User anotherUser = UserFixture.get(anotherEmail, "kkk", 2L);
+
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+        when(postRepository.findById(postId)).thenReturn(Optional.empty());
+        when(userRepository.findByEmail(anotherEmail)).thenReturn(Optional.of(anotherUser));
+
+        SnsApplicationException e = assertThrows(SnsApplicationException.class, () -> postService.like(anotherEmail, postId));
+        assertThat(e.getErrorCode()).isEqualTo(POST_NOT_FOUND);
+    }
+
 }
