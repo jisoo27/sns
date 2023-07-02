@@ -50,4 +50,10 @@ public class PostController {
         return ResponseEntity.ok().build();
     }
 
+    @DeleteMapping("/{postId}/likes")
+    public ResponseEntity<Void> notLike(@PathVariable Long postId, Authentication authentication) {
+        postService.notLike(authentication.getName(), postId);
+        return ResponseEntity.noContent().build();
+    }
+
 }
