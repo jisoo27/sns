@@ -4,10 +4,8 @@ import com.project.sns.post.controller.dto.request.PostCreateRequest;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-
 import java.util.HashMap;
 import java.util.Map;
-
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 public class PostSteps {
@@ -64,6 +62,16 @@ public class PostSteps {
                                 token)
                 .contentType(APPLICATION_JSON_VALUE)
                 .when().post("/api/posts/{postId}/likes", postId)
+                .then().log().all().extract();
+    }
+
+    public static ExtractableResponse<Response> 게시물_좋아요_취소_요청(String token, Long postId) {
+        return RestAssured.given().log().all()
+                .headers("Authorization",
+                        "Bearer " +
+                                token)
+                .contentType(APPLICATION_JSON_VALUE)
+                .when().delete("/api/posts/{postId}/likes", postId)
                 .then().log().all().extract();
     }
 }

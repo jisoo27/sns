@@ -165,7 +165,7 @@ class PostAcceptanceTest extends AcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(UNAUTHORIZED.value());
     }
 
-    @DisplayName("로그인이 성공한 회원은 게시물에 좋아요를 누를 수 있다.")
+    @DisplayName("로그인이 성공한 회원은 게시물에 좋아요 요청 시 성공한다.")
     @Test
     void postLikeTest() {
 
@@ -185,7 +185,7 @@ class PostAcceptanceTest extends AcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(OK.value());
     }
 
-    @DisplayName("로그인에 실패한 경우 좋아요 버튼 클릭시 실패한다.")
+    @DisplayName("로그인에 실패한 경우 좋아요 요청 시 실패한다.")
     @Test
     void postLikeExceptionTest() {
 
@@ -202,7 +202,7 @@ class PostAcceptanceTest extends AcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(UNAUTHORIZED.value());
     }
 
-    @DisplayName("좋아요 버튼 클릭시 게시물이 없는 경우 좋아요 요청에 실패한다.")
+    @DisplayName("좋아요 요청 시 게시물이 없는 경우 좋아요 요청에 실패한다.")
     @Test
     void postLikeExceptionTest2() {
 
@@ -236,5 +236,62 @@ class PostAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(CONFLICT.value());
+    }
+
+    @DisplayName("로그인이 성공한 회원은 좋아요를 눌렀던 게시물에 좋아요 취소를 요청할 경우 성공한다.")
+    @Test
+    void PostNotLikeTest() {
+
+        // given
+        var 로그인_요청 = 베어러_인증_로그인_요청(EMAIL, PASSWORD);
+        var 유효한_토큰 = 베어러_인증_응답에서_token_가져오기(로그인_요청);
+        var 게시물_id = 게시물_등록_요청(유효한_토큰, new PostCreateRequest(List.of("//", "ss"), "내용이다.")).jsonPath().getLong("id");
+
+        회원가입_요청(30, "anotherAdmin@email.com", "kkk", "sosomi", "somin", "경기도 용인시", "반가워", "/");
+        var 다른_로그인_요청 = 베어러_인증_로그인_요청("anotherAdmin@email.com", "kkk");
+        var 다른_유효한_토큰 = 베어러_인증_응답에서_token_가져오기(다른_로그인_요청);
+        게시물_좋아요_누르기_요청(다른_유효한_토큰, 게시물_id);
+
+        var response = 게시물_좋아요_취소_요청(다른_유효한_토큰, 게시물_id);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(NO_CONTENT.value());
+    }
+
+    @DisplayName("로그인에 실패한 경우 좋아요 취소 요청에 실패한다.")
+    @Test
+    void postNotLikeExceptionTest() {
+
+        // given
+        var 로그인_요청 = 베어러_인증_로그인_요청(EMAIL, PASSWORD);
+        var 유효한_토큰 = 베어러_인증_응답에서_token_가져오기(로그인_요청);
+        var 게시물_id = 게시물_등록_요청(유효한_토큰, new PostCreateRequest(List.of("//", "ss"), "내용이다.")).jsonPath().getLong("id");
+
+        회원가입_요청(30, "anotherAdmin@email.com", "kkk", "sosomi", "somin", "경기도 용인시", "반가워", "/");
+        var 다른_로그인_요청 = 베어러_인증_로그인_요청("anotherAdmin@email.com", "kkk");
+        var 다른_유효한_토큰 = 베어러_인증_응답에서_token_가져오기(다른_로그인_요청);
+        게시물_좋아요_누르기_요청(다른_유효한_토큰, 게시물_id);
+
+        // when
+        var 유효하지_않은_토큰 = "kkk..";
+        var response = 게시물_좋아요_취소_요청(유효하지_않은_토큰, 게시물_id);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(UNAUTHORIZED.value());
+    }
+
+    @DisplayName("좋아요 취소 요청 시 게시물이 없는 경우 좋아요 취소 요청에 실패한다.")
+    @Test
+    void postNotLikeExceptionTest2() {
+
+        // given
+        var 로그인_요청 = 베어러_인증_로그인_요청(EMAIL, PASSWORD);
+        var 유효한_토큰 = 베어러_인증_응답에서_token_가져오기(로그인_요청);
+
+        // when
+        var response = 게시물_좋아요_취소_요청(유효한_토큰, 1L);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(NOT_FOUND.value());
     }
 }
