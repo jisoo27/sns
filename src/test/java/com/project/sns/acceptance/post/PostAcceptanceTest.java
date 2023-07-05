@@ -294,4 +294,57 @@ class PostAcceptanceTest extends AcceptanceTest {
         // then
         assertThat(response.statusCode()).isEqualTo(NOT_FOUND.value());
     }
+
+    @DisplayName("로그인을 성공한 회원은 자신이 좋아요 한 게시글 조회 시 요청에 성공한다.")
+    @Test
+    void getMyLikePostTest() {
+
+        // given
+        var 로그인_요청 = 베어러_인증_로그인_요청(EMAIL, PASSWORD);
+        var 유효한_토큰 = 베어러_인증_응답에서_token_가져오기(로그인_요청);
+        var 첫번째_게시물_id = 게시물_등록_요청(유효한_토큰, new PostCreateRequest(List.of("//", "ss"), "내용이다.")).jsonPath().getLong("id");
+        var 두번째_게시물_id = 게시물_등록_요청(유효한_토큰, new PostCreateRequest(List.of("dd", "kk"), "두번째 내용")).jsonPath().getLong("id");
+
+        회원가입_요청(30, "anotherAdmin@email.com", "kkk", "sosomi", "somin", "경기도 용인시", "반가워", "/");
+        var 다른_로그인_요청 = 베어러_인증_로그인_요청("anotherAdmin@email.com", "kkk");
+        var 다른_유효한_토큰 = 베어러_인증_응답에서_token_가져오기(다른_로그인_요청);
+        게시물_좋아요_누르기_요청(다른_유효한_토큰, 첫번째_게시물_id);
+        게시물_좋아요_누르기_요청(다른_유효한_토큰, 두번째_게시물_id);
+
+        // when
+        var response = 내가_좋아요_한_게시물_조회_요청(다른_유효한_토큰);
+
+        // then
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(OK.value()),
+                () -> assertThat(response.jsonPath().getLong("content.get(0).id")).isEqualTo(1L),
+                () -> assertThat(response.jsonPath().getString("content.get(0).content")).isEqualTo("내용이다."),
+                () -> assertThat(response.jsonPath().getLong("content.get(1).id")).isEqualTo(2L),
+                () -> assertThat(response.jsonPath().getString("content.get(1).content")).isEqualTo("두번째 내용")
+        );
+    }
+
+    @DisplayName("로그인에 실패한 회원은 자신이 좋아요 한 게시글 조회 시 요청에 실패한다.")
+    @Test
+    void getMyLikePostExceptionTest() {
+
+        // given
+        var 로그인_요청 = 베어러_인증_로그인_요청(EMAIL, PASSWORD);
+        var 유효한_토큰 = 베어러_인증_응답에서_token_가져오기(로그인_요청);
+        var 첫번째_게시물_id = 게시물_등록_요청(유효한_토큰, new PostCreateRequest(List.of("//", "ss"), "내용이다.")).jsonPath().getLong("id");
+        var 두번째_게시물_id = 게시물_등록_요청(유효한_토큰, new PostCreateRequest(List.of("dd", "kk"), "두번째 내용")).jsonPath().getLong("id");
+
+        회원가입_요청(30, "anotherAdmin@email.com", "kkk", "sosomi", "somin", "경기도 용인시", "반가워", "/");
+        var 다른_로그인_요청 = 베어러_인증_로그인_요청("anotherAdmin@email.com", "kkk");
+        var 다른_유효한_토큰 = 베어러_인증_응답에서_token_가져오기(다른_로그인_요청);
+        게시물_좋아요_누르기_요청(다른_유효한_토큰, 첫번째_게시물_id);
+        게시물_좋아요_누르기_요청(다른_유효한_토큰, 두번째_게시물_id);
+
+        // when
+        var 유효하지_않은_토큰 = "kkk..";
+        var response = 내가_좋아요_한_게시물_조회_요청(유효하지_않은_토큰);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(UNAUTHORIZED.value());
+    }
 }

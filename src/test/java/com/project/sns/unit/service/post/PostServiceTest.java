@@ -302,7 +302,7 @@ class PostServiceTest {
         assertThat(e.getErrorCode()).isEqualTo(POST_NOT_FOUND);
     }
 
-    @DisplayName("좋아요 취소 요청시, 좋아요를 한 당사자가 아니라면 요청을 실패한다.")
+    @DisplayName("좋아요 취소 요청시, 좋아요가 되어있지 않으면 요청에 실패한다.")
     @Test
     void postNotLikeExceptionTest2() {
 
@@ -324,5 +324,7 @@ class PostServiceTest {
         SnsApplicationException e = assertThrows(SnsApplicationException.class, () -> postService.notLike(email, postId));
         assertThat(e.getErrorCode()).isEqualTo(LIKE_NOT_FOUND);
     }
+
+
 
 }
