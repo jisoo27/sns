@@ -325,6 +325,22 @@ class PostServiceTest {
         assertThat(e.getErrorCode()).isEqualTo(LIKE_NOT_FOUND);
     }
 
+    // TODO : 조금 더 생각해보기
+    @DisplayName("자신이 좋아요 한 글 조회 요청 시 성공한 경우")
+    @Test
+    void getMyLikePostTest() {
 
+        Pageable pageable = mock(Pageable.class);
+        String email = "admin@email.com";
+        Long postId = 1L;
+
+        Post post = PostFixture.get(email, postId, 1L);
+        User user = post.getUser();
+
+        when(userRepository.findByEmail(any())).thenReturn(Optional.of(user));
+        when(likeRepository.findAllByUser(user, pageable)).thenReturn(Page.empty());
+
+        assertDoesNotThrow(() -> postService.getMyLikeList(user.getEmail(), pageable));
+    }
 
 }

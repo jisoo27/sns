@@ -66,7 +66,6 @@ public class PostService {
 
     @Transactional
     public void like(String email, Long postId) {
-
         Post post = postRepository.findById(postId).orElseThrow(() -> new SnsApplicationException(POST_NOT_FOUND));
         User user = userRepository.findByEmail(email).orElseThrow(() -> new SnsApplicationException(USER_NOT_FOUND));
 
@@ -80,7 +79,6 @@ public class PostService {
 
     @Transactional
     public void notLike(String email, Long postId) {
-
         Post post = postRepository.findById(postId).orElseThrow(() -> new SnsApplicationException(POST_NOT_FOUND));
         User user = userRepository.findByEmail(email).orElseThrow(() -> new SnsApplicationException(USER_NOT_FOUND));
         Like like = likeRepository.findByUserAndPost(user, post).orElseThrow(() -> new SnsApplicationException(LIKE_NOT_FOUND));
