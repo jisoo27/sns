@@ -83,8 +83,12 @@ public class PostService {
 
         Post post = postRepository.findById(postId).orElseThrow(() -> new SnsApplicationException(POST_NOT_FOUND));
         User user = userRepository.findByEmail(email).orElseThrow(() -> new SnsApplicationException(USER_NOT_FOUND));
-
         Like like = likeRepository.findByUserAndPost(user, post).orElseThrow(() -> new SnsApplicationException(LIKE_NOT_FOUND));
         likeRepository.delete(like);
+    }
+
+    public Page<PostResponse> getMyLikeList(String email, Pageable pageable) {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new SnsApplicationException(USER_NOT_FOUND));
+        return likeRepository.findAllByUser(user, pageable).map(like -> PostResponse.of(like.getPost()));
     }
 }

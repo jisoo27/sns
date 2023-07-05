@@ -52,11 +52,10 @@ public class User extends Auditable implements UserDetails {
     @Enumerated(EnumType.STRING)
     private final UserRole role = UserRole.USER;
 
-
     @OneToMany(mappedBy = "user")
     private List<Post> posts = new ArrayList<>();
 
-    @OneToMany(mappedBy = "")
+    @OneToMany(mappedBy = "user")
     private List<Like> likes = new ArrayList<>();
 
 

@@ -56,4 +56,11 @@ public class PostController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/likes")
+    public ResponseEntity<Page<PostResponse>> getMyLikeList(Pageable pageable, Authentication authentication) {
+        Page<PostResponse> list = postService.getMyLikeList(authentication.getName(), pageable);
+        return ResponseEntity.ok().body(list);
+    }
+
+
 }
