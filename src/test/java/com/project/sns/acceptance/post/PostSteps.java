@@ -84,4 +84,14 @@ public class PostSteps {
                 .when().get("/api/posts/likes")
                 .then().log().all().extract();
     }
+
+    public static ExtractableResponse<Response> 게시물_좋아요_개수_조회_요청(String token, Long postId) {
+        return RestAssured.given().log().all()
+                .headers("Authorization",
+                        "Bearer " +
+                                token)
+                .contentType(APPLICATION_JSON_VALUE)
+                .when().get("/api/posts/{postId}/likes", postId)
+                .then().log().all().extract();
+    }
 }

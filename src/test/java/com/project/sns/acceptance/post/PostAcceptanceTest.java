@@ -252,6 +252,7 @@ class PostAcceptanceTest extends AcceptanceTest {
         var 다른_유효한_토큰 = 베어러_인증_응답에서_token_가져오기(다른_로그인_요청);
         게시물_좋아요_누르기_요청(다른_유효한_토큰, 게시물_id);
 
+        // when
         var response = 게시물_좋아요_취소_요청(다른_유효한_토큰, 게시물_id);
 
         // then
@@ -343,6 +344,53 @@ class PostAcceptanceTest extends AcceptanceTest {
         // when
         var 유효하지_않은_토큰 = "kkk..";
         var response = 내가_좋아요_한_게시물_조회_요청(유효하지_않은_토큰);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(UNAUTHORIZED.value());
+    }
+
+    @DisplayName("로그인에 성공한 회원은 게시물의 좋아요 개수 조회 요청에 성공한다.")
+    @Test
+    void getPostLikeCount() {
+
+        // given
+        var 로그인_요청 = 베어러_인증_로그인_요청(EMAIL, PASSWORD);
+        var 유효한_토큰 = 베어러_인증_응답에서_token_가져오기(로그인_요청);
+        var 첫번째_게시물_id = 게시물_등록_요청(유효한_토큰, new PostCreateRequest(List.of("//", "ss"), "내용이다.")).jsonPath().getLong("id");
+
+        회원가입_요청(30, "anotherAdmin@email.com", "kkk", "sosomi", "somin", "경기도 용인시", "반가워", "/");
+        var 다른_로그인_요청 = 베어러_인증_로그인_요청("anotherAdmin@email.com", "kkk");
+        var 다른_유효한_토큰 = 베어러_인증_응답에서_token_가져오기(다른_로그인_요청);
+        게시물_좋아요_누르기_요청(다른_유효한_토큰, 첫번째_게시물_id);
+
+        // when
+        var response = 게시물_좋아요_개수_조회_요청(다른_유효한_토큰, 첫번째_게시물_id);
+
+        // then
+        int 좋아요_개수 = response.jsonPath().getInt("count");
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(OK.value()),
+                () -> assertThat(좋아요_개수).isEqualTo(1)
+        );
+    }
+
+    @DisplayName("로그인에 실패한 회원은 좋아요 개수 조회 요청에 실패한다.")
+    @Test
+    void getPostLikeCountExceptionTest() {
+
+        // given
+        var 로그인_요청 = 베어러_인증_로그인_요청(EMAIL, PASSWORD);
+        var 유효한_토큰 = 베어러_인증_응답에서_token_가져오기(로그인_요청);
+        var 첫번째_게시물_id = 게시물_등록_요청(유효한_토큰, new PostCreateRequest(List.of("//", "ss"), "내용이다.")).jsonPath().getLong("id");
+
+        회원가입_요청(30, "anotherAdmin@email.com", "kkk", "sosomi", "somin", "경기도 용인시", "반가워", "/");
+        var 다른_로그인_요청 = 베어러_인증_로그인_요청("anotherAdmin@email.com", "kkk");
+        var 다른_유효한_토큰 = 베어러_인증_응답에서_token_가져오기(다른_로그인_요청);
+        게시물_좋아요_누르기_요청(다른_유효한_토큰, 첫번째_게시물_id);
+
+        // when
+        var 유효하지_않은_토큰 = "kkk..";
+        var response = 게시물_좋아요_개수_조회_요청(유효하지_않은_토큰, 첫번째_게시물_id);
 
         // then
         assertThat(response.statusCode()).isEqualTo(UNAUTHORIZED.value());
