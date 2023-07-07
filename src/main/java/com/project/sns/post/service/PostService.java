@@ -5,6 +5,7 @@ import com.project.sns.image.domain.Image;
 import com.project.sns.like.domain.Like;
 import com.project.sns.like.repository.LikeRepository;
 import com.project.sns.post.controller.dto.response.PostEditResponse;
+import com.project.sns.post.controller.dto.response.PostLikeCountResponse;
 import com.project.sns.post.controller.dto.response.PostResponse;
 import com.project.sns.post.domain.Post;
 import com.project.sns.post.repository.PostRepository;
@@ -88,5 +89,11 @@ public class PostService {
     public Page<PostResponse> getMyLikeList(String email, Pageable pageable) {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new SnsApplicationException(USER_NOT_FOUND));
         return likeRepository.findAllByUser(user, pageable).map(like -> PostResponse.of(like.getPost()));
+    }
+
+    public PostLikeCountResponse getLikeCount(Long postId) {
+        Post post = postRepository.findById(postId).orElseThrow(() -> new SnsApplicationException(POST_NOT_FOUND));
+        Integer count = likeRepository.countByPost(post);
+        return PostLikeCountResponse.builder().count(count).build();
     }
 }

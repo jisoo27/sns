@@ -6,6 +6,8 @@ import com.project.sns.user.domain.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
 import java.util.Optional;
 
 public interface LikeRepository extends JpaRepository<Like, Long> {
@@ -13,4 +15,7 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
     Optional<Like> findByUserAndPost(User user, Post post);
 
     Page<Like> findAllByUser(User user, Pageable pageable);
+
+    @Query(value = "select count(*) from likes l where l.post =:post")
+    Integer countByPost(Post post);
 }

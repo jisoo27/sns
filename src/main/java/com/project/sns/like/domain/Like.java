@@ -30,10 +30,6 @@ public class Like extends Auditable {
     @ManyToOne(fetch = LAZY)
     private Post post;
 
-    public boolean notCheckUser(User user) {
-        return this.getUser() != user;
-    }
-
     public static Like of(User user, Post post) {
         return Like.builder()
                 .user(user)

@@ -2,6 +2,7 @@ package com.project.sns.post.controller;
 
 import com.project.sns.post.controller.dto.request.PostCreateRequest;
 import com.project.sns.post.controller.dto.request.PostEditRequest;
+import com.project.sns.post.controller.dto.response.PostLikeCountResponse;
 import com.project.sns.post.controller.dto.response.PostEditResponse;
 import com.project.sns.post.controller.dto.response.PostResponse;
 import com.project.sns.post.service.PostService;
@@ -62,5 +63,9 @@ public class PostController {
         return ResponseEntity.ok().body(list);
     }
 
-
+    @GetMapping("/{postId}/likes")
+    public ResponseEntity<PostLikeCountResponse> getLikeCount(@PathVariable Long postId, Authentication authentication) {
+        PostLikeCountResponse response = postService.getLikeCount(postId);
+        return ResponseEntity.ok().body(response);
+    }
 }
