@@ -343,4 +343,25 @@ class PostServiceTest {
         assertDoesNotThrow(() -> postService.getMyLikeList(user.getEmail(), pageable));
     }
 
+    @DisplayName("좋아요 개수 조회 요청 시 성공한 경우")
+    @Test
+    void getPostLikeCountTest() {
+
+        String email = "admin@email.com";
+        Long postId = 1L;
+
+        Post post = PostFixture.get(email, postId, 1L);
+        User user = post.getUser();
+
+        String anotherEmail = "somin@email.com";
+        User anotherUser = UserFixture.get(anotherEmail, "kkk", 2L);
+        Like like = LikeFixture.get(anotherEmail, postId, anotherUser.getId(), 1L);
+
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+        when(postRepository.findById(postId)).thenReturn(Optional.of(post));
+        when(userRepository.findByEmail(anotherEmail)).thenReturn(Optional.of(anotherUser));
+        when(likeRepository.findByUserAndPost(anotherUser, post)).thenReturn(Optional.of(like));
+
+        assertDoesNotThrow(() -> postService.getLikeCount(postId));
+    }
 }
