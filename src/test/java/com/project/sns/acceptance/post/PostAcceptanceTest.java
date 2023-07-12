@@ -395,4 +395,56 @@ class PostAcceptanceTest extends AcceptanceTest {
         // then
         assertThat(response.statusCode()).isEqualTo(UNAUTHORIZED.value());
     }
+
+    @DisplayName("로그인에 성공한 회원은 댓글 작성 요청에 성공한다.")
+    @Test
+    void commentSaveTest() {
+
+        // given
+        var 로그인_요청 = 베어러_인증_로그인_요청(EMAIL, PASSWORD);
+        var 유효한_토큰 = 베어러_인증_응답에서_token_가져오기(로그인_요청);
+        var 첫번째_게시물_id = 게시물_등록_요청(유효한_토큰, new PostCreateRequest(List.of("//", "ss"), "내용이다.")).jsonPath().getLong("id");
+
+        회원가입_요청(30, "anotherAdmin@email.com", "kkk", "sosomi", "somin", "경기도 용인시", "반가워", "/");
+        var 다른_로그인_요청 = 베어러_인증_로그인_요청("anotherAdmin@email.com", "kkk");
+        var 다른_유효한_토큰 = 베어러_인증_응답에서_token_가져오기(다른_로그인_요청);
+
+        // when
+        var response = 댓글_생성_요청(다른_유효한_토큰, "첫번째 댓글..", 첫번째_게시물_id);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(OK.value());
+    }
+
+    @DisplayName("로그인에 성공한 회원은 댓글 작성 요청 시 게시물이 존재하지 않을 경우 실패한다.")
+    @Test
+    void commentSaveExceptionTest() {
+
+        // given
+        var 로그인_요청 = 베어러_인증_로그인_요청(EMAIL, PASSWORD);
+        var 유효한_토큰 = 베어러_인증_응답에서_token_가져오기(로그인_요청);
+
+        // when
+        var response = 댓글_생성_요청(유효한_토큰, "첫번째 댓글..", 1L);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(NOT_FOUND.value());
+    }
+
+    @DisplayName("로그인에 실패한 회원은 댓글 작성 요청에 실패한다.")
+    @Test
+    void commentSaveExceptionTest2() {
+
+        // given
+        var 로그인_요청 = 베어러_인증_로그인_요청(EMAIL, PASSWORD);
+        var 유효한_토큰 = 베어러_인증_응답에서_token_가져오기(로그인_요청);
+        var 첫번째_게시물_id = 게시물_등록_요청(유효한_토큰, new PostCreateRequest(List.of("//", "ss"), "내용이다.")).jsonPath().getLong("id");
+
+        // when
+        var 유효하지_않은_토큰 = "kkk..";
+        var response = 댓글_생성_요청(유효하지_않은_토큰, "첫번째 댓글..", 첫번째_게시물_id);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(UNAUTHORIZED.value());
+    }
 }
