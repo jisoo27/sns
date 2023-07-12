@@ -1,6 +1,9 @@
 package com.project.sns.unit.service.post;
 
+import com.project.sns.comment.domain.Comment;
+import com.project.sns.comment.repository.CommentRepository;
 import com.project.sns.exception.SnsApplicationException;
+import com.project.sns.fixture.CommentFixture;
 import com.project.sns.fixture.LikeFixture;
 import com.project.sns.fixture.PostFixture;
 import com.project.sns.fixture.UserFixture;
@@ -47,6 +50,10 @@ class PostServiceTest {
 
     @MockBean
     private LikeRepository likeRepository;
+
+    @MockBean
+    private CommentRepository commentRepository;
+
 
     @DisplayName("게시글 등록이 성공한 경우")
     @Test
@@ -363,5 +370,46 @@ class PostServiceTest {
         when(likeRepository.findByUserAndPost(anotherUser, post)).thenReturn(Optional.of(like));
 
         assertDoesNotThrow(() -> postService.getLikeCount(postId));
+    }
+
+    @DisplayName("댓글 생성 요청 시 성공한 경우")
+    @Test
+    void commentSaveTest() {
+
+        String email = "admin@email.com";
+        Long postId = 1L;
+
+        Post post = PostFixture.get(email, postId, 1L);
+        User user = post.getUser();
+        Long commentId = 1L;
+        Comment comment = CommentFixture.get(email, postId, user.getId(), commentId);
+        String firstComment = "첫번째 댓글";
+
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+        when(postRepository.findById(postId)).thenReturn(Optional.of(post));
+        when(commentRepository.findById(commentId)).thenReturn(Optional.of(comment));
+
+        assertDoesNotThrow(() -> postService.commentCreate(postId, email, firstComment));
+    }
+
+    @DisplayName("댓글 생성 요청 시 게시물이 존재하지 않는 경우")
+    @Test
+    void commentSaveExceptionTest() {
+
+        String email = "admin@email.com";
+        Long postId = 1L;
+
+        Post post = PostFixture.get(email, postId, 1L);
+        User user = post.getUser();
+        Long commentId = 1L;
+        Comment comment = CommentFixture.get(email, postId, user.getId(), commentId);
+        String firstComment = "첫번째 댓글";
+
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+        when(postRepository.findById(postId)).thenReturn(Optional.empty());
+        when(commentRepository.findById(commentId)).thenReturn(Optional.of(comment));
+
+        SnsApplicationException e = assertThrows(SnsApplicationException.class, () -> postService.commentCreate(postId, email, firstComment));
+        assertThat(e.getErrorCode()).isEqualTo(POST_NOT_FOUND);
     }
 }
