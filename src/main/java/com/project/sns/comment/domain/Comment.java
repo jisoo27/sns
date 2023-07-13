@@ -48,4 +48,7 @@ public class Comment extends Auditable {
                 .build();
     }
 
+    public void edit(String content) {
+        this.content = content;
+    }
 }

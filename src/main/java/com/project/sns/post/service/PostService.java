@@ -1,7 +1,5 @@
 package com.project.sns.post.service;
 
-import com.project.sns.comment.domain.Comment;
-import com.project.sns.comment.repository.CommentRepository;
 import com.project.sns.exception.SnsApplicationException;
 import com.project.sns.image.domain.Image;
 import com.project.sns.like.domain.Like;
@@ -28,7 +26,7 @@ public class PostService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final LikeRepository likeRepository;
-    private final CommentRepository commentRepository;
+
 
     @Transactional
     public PostResponse create(List<String> imagePaths, String content, String email) {
@@ -99,13 +97,4 @@ public class PostService {
         Integer count = likeRepository.countByPost(post);
         return PostLikeCountResponse.builder().count(count).build();
     }
-
-    @Transactional
-    public void commentCreate(Long postId, String email, String comment) {
-        Post post = postRepository.findById(postId).orElseThrow(() -> new SnsApplicationException(POST_NOT_FOUND));
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new SnsApplicationException(USER_NOT_FOUND));
-
-        commentRepository.save(Comment.of(user, post, comment));
-    }
-
 }
