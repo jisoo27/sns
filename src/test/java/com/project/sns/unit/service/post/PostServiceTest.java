@@ -1,6 +1,5 @@
 package com.project.sns.unit.service.post;
 
-import com.project.sns.comment.repository.CommentRepository;
 import com.project.sns.exception.SnsApplicationException;
 import com.project.sns.fixture.LikeFixture;
 import com.project.sns.fixture.PostFixture;

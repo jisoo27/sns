@@ -8,6 +8,7 @@ public class PostFixture {
     public static Post get(String email, Long postId, Long userId) {
         User user = User.builder()
                 .email(email)
+                .userName("user")
                 .id(userId)
                 .build();
         return Post.builder()

@@ -1,7 +1,6 @@
 package com.project.sns.fixture;
 
 import com.project.sns.comment.domain.Comment;
-import com.project.sns.like.domain.Like;
 import com.project.sns.post.domain.Post;
 import com.project.sns.user.domain.User;
 

@@ -15,12 +15,12 @@ public class CommentResponse {
     private String userName;
     private Long postId;
 
-    public static CommentResponse of (Comment comment) {
+    public static CommentResponse of (Comment comment, String userName, Long postId) {
         return new CommentResponse(
                 comment.getId(),
                 comment.getContent(),
-                comment.getUser().getUsername(),
-                comment.getPost().getId()
+                userName,
+                postId
         );
     }
 }

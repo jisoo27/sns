@@ -28,7 +28,7 @@ public class CommentService {
         Post post = postRepository.findById(postId).orElseThrow(() -> new SnsApplicationException(POST_NOT_FOUND));
         User user = userRepository.findByEmail(email).orElseThrow(() -> new SnsApplicationException(USER_NOT_FOUND));
         Comment comment = commentRepository.save(Comment.of(user, post, content));
-        return CommentResponse.of(comment);
+        return CommentResponse.of(comment, user.getUsername(), postId);
     }
 
     @Transactional
@@ -40,6 +40,6 @@ public class CommentService {
             throw new SnsApplicationException(INVALID_PERMISSION);
         }
         comment.edit(editContent);
-        return CommentResponse.of(comment);
+        return CommentResponse.of(comment, user.getUsername(), postId);
     }
 }
