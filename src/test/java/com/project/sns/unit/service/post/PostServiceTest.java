@@ -378,4 +378,17 @@ class PostServiceTest {
 
         assertDoesNotThrow(() -> postService.getAllList(user.getEmail(), pageable));
     }
+
+    @DisplayName("회원 나이 대 별 모아보기 요청에 성공한 경우")
+    @Test
+    void getUserAgeFilterTest() {
+
+        Pageable pageable = mock(Pageable.class);
+        User user = mock(User.class);
+
+        when(userRepository.findByEmail(any())).thenReturn(Optional.of(user));
+        when(postRepository.findAllByAge(pageable, 20, 30)).thenReturn(Page.empty());
+
+        assertDoesNotThrow(() -> postService.getAgeFilterList(user.getEmail(), 20, 30, pageable));
+    }
 }
