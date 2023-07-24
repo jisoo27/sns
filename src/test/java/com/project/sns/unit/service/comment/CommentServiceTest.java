@@ -148,4 +148,78 @@ class CommentServiceTest {
         assertThat(e.getErrorCode()).isEqualTo(INVALID_PERMISSION);
     }
 
+    @DisplayName("댓글 삭제 요청 시 성공한 경우")
+    @Test
+    void deleteCommentTest() {
+
+        String email = "admin@email.com";
+        Long postId = 1L;
+
+        Post post = PostFixture.get(email, postId, 1L);
+        User user = post.getUser();
+
+        String anotherEmail = "somin@email.com";
+
+        Long commentId = 1L;
+        Comment comment = CommentFixture.get(anotherEmail, postId, 2L, commentId);
+        User anotherUser = comment.getUser();
+
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+        when(postRepository.findById(postId)).thenReturn(Optional.of(post));
+        when(userRepository.findByEmail(anotherEmail)).thenReturn(Optional.of(anotherUser));
+        when(commentRepository.findById(commentId)).thenReturn(Optional.of(comment));
+
+        assertDoesNotThrow(() -> commentService.delete(postId, commentId, anotherEmail));
+    }
+
+    @DisplayName("댓글 삭제 요청 시 댓글이 존재하지 않는 경우")
+    @Test
+    void deleteCommentExceptionTest() {
+
+        String email = "admin@email.com";
+        Long postId = 1L;
+
+        Post post = PostFixture.get(email, postId, 1L);
+        User user = post.getUser();
+
+        String anotherEmail = "somin@email.com";
+
+        Long commentId = 1L;
+        Comment comment = CommentFixture.get(anotherEmail, postId, 2L, commentId);
+        User anotherUser = comment.getUser();
+
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+        when(postRepository.findById(postId)).thenReturn(Optional.of(post));
+        when(userRepository.findByEmail(anotherEmail)).thenReturn(Optional.of(anotherUser));
+        when(commentRepository.findById(commentId)).thenReturn(Optional.empty());
+
+        SnsApplicationException e = assertThrows(SnsApplicationException.class, () -> commentService.delete(postId, commentId, anotherEmail));
+        assertThat(e.getErrorCode()).isEqualTo(COMMENT_NOT_FOUND);
+    }
+
+    @DisplayName("댓글 삭제 요청 시 권한이 없는 경우")
+    @Test
+    void deleteCommentExceptionTest2() {
+
+        String email = "admin@email.com";
+        Long postId = 1L;
+
+        Post post = PostFixture.get(email, postId, 1L);
+        User user = post.getUser();
+
+        String anotherEmail = "somin@email.com";
+
+        Long commentId = 1L;
+        Comment comment = CommentFixture.get(anotherEmail, postId, 2L, commentId);
+        User anotherUser = comment.getUser();
+
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+        when(postRepository.findById(postId)).thenReturn(Optional.of(post));
+        when(userRepository.findByEmail(anotherEmail)).thenReturn(Optional.of(anotherUser));
+        when(commentRepository.findById(commentId)).thenReturn(Optional.of(comment));
+
+        SnsApplicationException e = assertThrows(SnsApplicationException.class, () -> commentService.delete(postId, commentId, email));
+        assertThat(e.getErrorCode()).isEqualTo(INVALID_PERMISSION);
+    }
+
 }
