@@ -41,7 +41,7 @@ public class PostController {
 
     @GetMapping
     public ResponseEntity<Page<PostResponse>> getList(Pageable pageable, Authentication authentication) {
-        Page<PostResponse> list = postService.getList(authentication.getName(), pageable);
+        Page<PostResponse> list = postService.getAllList(authentication.getName(), pageable);
         return ResponseEntity.ok().body(list);
     }
 

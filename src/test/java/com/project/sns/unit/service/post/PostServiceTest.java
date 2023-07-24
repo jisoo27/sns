@@ -365,4 +365,17 @@ class PostServiceTest {
 
         assertDoesNotThrow(() -> postService.getLikeCount(postId));
     }
+
+    @DisplayName("모든 회원이 작성한 게시물 조회에 성공한 경우")
+    @Test
+    void getAllPostTest() {
+
+        Pageable pageable = mock(Pageable.class);
+        User user = mock(User.class);
+
+        when(userRepository.findByEmail(any())).thenReturn(Optional.of(user));
+        when(postRepository.findAll(pageable)).thenReturn(Page.empty());
+
+        assertDoesNotThrow(() -> postService.getAllList(user.getEmail(), pageable));
+    }
 }
