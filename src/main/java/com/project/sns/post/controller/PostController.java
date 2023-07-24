@@ -40,8 +40,14 @@ public class PostController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<PostResponse>> getList(Pageable pageable, Authentication authentication) {
+    public ResponseEntity<Page<PostResponse>> getAllList(Pageable pageable, Authentication authentication) {
         Page<PostResponse> list = postService.getAllList(authentication.getName(), pageable);
+        return ResponseEntity.ok().body(list);
+    }
+
+    @GetMapping("/users/age")
+    public ResponseEntity<Page<PostResponse>> getAgeFilterList(@RequestParam("low") int low, @RequestParam("high") int high, Pageable pageable, Authentication authentication) {
+        Page<PostResponse> list = postService.getAgeFilterList(authentication.getName(), low, high, pageable);
         return ResponseEntity.ok().body(list);
     }
 
@@ -74,4 +80,5 @@ public class PostController {
         PostLikeCountResponse response = postService.getLikeCount(postId);
         return ResponseEntity.ok().body(response);
     }
+
 }

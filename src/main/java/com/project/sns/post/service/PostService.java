@@ -102,4 +102,9 @@ public class PostService {
         userRepository.findByEmail(email).orElseThrow(() -> new SnsApplicationException(USER_NOT_FOUND));
         return postRepository.findAll(pageable).map(PostResponse::of);
     }
+
+    public Page<PostResponse> getAgeFilterList(String email, int low, int high, Pageable pageable) {
+        userRepository.findByEmail(email).orElseThrow(() -> new SnsApplicationException(USER_NOT_FOUND));
+        return postRepository.findAllByAge(pageable, low, high).map(PostResponse::of);
+    }
 }
