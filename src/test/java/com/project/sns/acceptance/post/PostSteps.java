@@ -104,4 +104,20 @@ public class PostSteps {
                 .when().get("/api/posts")
                 .then().log().all().extract();
     }
+
+    public static ExtractableResponse<Response> 회원_나이_별_게시물_조회_요청(String token, int low, int high) {
+        Map<String, Integer> params = new HashMap<>();
+        params.put("low", low);
+        params.put("high", high);
+
+        return RestAssured.given().log().all()
+                .headers("Authorization",
+                        "Bearer " +
+                                token)
+                .params(params)
+                .contentType(APPLICATION_JSON_VALUE)
+                .when().get("/api/posts/users/age")
+                .then().log().all().extract();
+    }
+
 }

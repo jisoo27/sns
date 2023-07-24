@@ -24,7 +24,7 @@ class PostAcceptanceTest extends AcceptanceTest {
 
     @BeforeEach
     void before() {
-        회원가입_요청(20, EMAIL, PASSWORD, "admin", "admmin", "경기도 수원시", "안녕", "/");
+        회원가입_요청(22, EMAIL, PASSWORD, "admin", "admmin", "경기도 수원시", "안녕", "/");
     }
 
 
@@ -449,6 +449,59 @@ class PostAcceptanceTest extends AcceptanceTest {
         // when
         var 유효하지_않은_토큰 = "kkk..";
         var response = 모든_게시물_조회_요청(유효하지_않은_토큰);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(UNAUTHORIZED.value());
+    }
+
+    @DisplayName("로그인에 성공한 회원은 회원의 나이 대 별 글 조회 요청에 성공한다.")
+    @Test
+    void getUserAgeFilterTest() {
+
+        // given
+        var 로그인_요청 = 베어러_인증_로그인_요청(EMAIL, PASSWORD);
+        var 유효한_토큰 = 베어러_인증_응답에서_token_가져오기(로그인_요청);
+        게시물_등록_요청(유효한_토큰, new PostCreateRequest(List.of(), "내용이다."));
+        게시물_등록_요청(유효한_토큰, new PostCreateRequest(List.of(), "두번째 내용"));
+
+        회원가입_요청(30, "anotherAdmin@email.com", "kkk", "sosomi", "somin", "경기도 용인시", "반가워", "/");
+        var 다른_로그인_요청 = 베어러_인증_로그인_요청("anotherAdmin@email.com", "kkk");
+        var 다른_유효한_토큰 = 베어러_인증_응답에서_token_가져오기(다른_로그인_요청);
+        게시물_등록_요청(다른_유효한_토큰, new PostCreateRequest(List.of(), "세번째 내용"));
+        게시물_등록_요청(다른_유효한_토큰, new PostCreateRequest(List.of(), "네번째 내용"));
+
+        // when
+        var response = 회원_나이_별_게시물_조회_요청(유효한_토큰, 20, 30);
+
+        // then
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(OK.value()),
+                () -> assertThat(response.jsonPath().getLong("content.get(0).id")).isEqualTo(1L),
+                () -> assertThat(response.jsonPath().getString("content.get(0).content")).isEqualTo("내용이다."),
+                () -> assertThat(response.jsonPath().getLong("content.get(1).id")).isEqualTo(2L),
+                () -> assertThat(response.jsonPath().getString("content.get(1).content")).isEqualTo("두번째 내용")
+        );
+    }
+
+    @DisplayName("로그인에 실패한 회원은 회원의 나이 대 별 글 조회 요청에 실패한다.")
+    @Test
+    void getUserAgeFilterExceptionTest() {
+
+        // given
+        var 로그인_요청 = 베어러_인증_로그인_요청(EMAIL, PASSWORD);
+        var 유효한_토큰 = 베어러_인증_응답에서_token_가져오기(로그인_요청);
+        게시물_등록_요청(유효한_토큰, new PostCreateRequest(List.of(), "내용이다."));
+        게시물_등록_요청(유효한_토큰, new PostCreateRequest(List.of(), "두번째 내용"));
+
+        회원가입_요청(30, "anotherAdmin@email.com", "kkk", "sosomi", "somin", "경기도 용인시", "반가워", "/");
+        var 다른_로그인_요청 = 베어러_인증_로그인_요청("anotherAdmin@email.com", "kkk");
+        var 다른_유효한_토큰 = 베어러_인증_응답에서_token_가져오기(다른_로그인_요청);
+        게시물_등록_요청(다른_유효한_토큰, new PostCreateRequest(List.of(), "세번째 내용"));
+        게시물_등록_요청(다른_유효한_토큰, new PostCreateRequest(List.of(), "네번째 내용"));
+
+        // when
+        var 유효하지_않은_토큰 = "kkk..";
+        var response = 회원_나이_별_게시물_조회_요청(유효하지_않은_토큰, 20, 30);
 
         // then
         assertThat(response.statusCode()).isEqualTo(UNAUTHORIZED.value());
