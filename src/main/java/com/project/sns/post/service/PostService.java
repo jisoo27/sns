@@ -97,4 +97,9 @@ public class PostService {
         Integer count = likeRepository.countByPost(post);
         return PostLikeCountResponse.builder().count(count).build();
     }
+
+    public Page<PostResponse> getList(String email, Pageable pageable) {
+        userRepository.findByEmail(email).orElseThrow(() -> new SnsApplicationException(USER_NOT_FOUND));
+        return postRepository.findAll(pageable).map(PostResponse::of);
+    }
 }

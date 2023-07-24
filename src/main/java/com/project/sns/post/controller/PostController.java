@@ -33,10 +33,16 @@ public class PostController {
         return ResponseEntity.ok().body(response);
     }
 
-    @GetMapping
+    @GetMapping("/my")
     public ResponseEntity<Page<PostResponse>> getMyList(Pageable pageable, Authentication authentication) {
         Page<PostResponse> myList = postService.getMyList(authentication.getName(), pageable);
         return ResponseEntity.ok().body(myList);
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<PostResponse>> getList(Pageable pageable, Authentication authentication) {
+        Page<PostResponse> list = postService.getList(authentication.getName(), pageable);
+        return ResponseEntity.ok().body(list);
     }
 
     @DeleteMapping("/{postId}")
