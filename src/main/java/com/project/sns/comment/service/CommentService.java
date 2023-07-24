@@ -42,4 +42,14 @@ public class CommentService {
         comment.edit(editContent);
         return CommentResponse.of(comment, user.getUsername(), postId);
     }
+
+    public void delete(Long postId, Long commentId, String email) {
+        postRepository.findById(postId).orElseThrow(() -> new SnsApplicationException(POST_NOT_FOUND));
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new SnsApplicationException(USER_NOT_FOUND));
+        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new SnsApplicationException(COMMENT_NOT_FOUND));
+        if (comment.isCheckUser(user)) {
+            throw new SnsApplicationException(INVALID_PERMISSION);
+        }
+        commentRepository.delete(comment);
+    }
 }
