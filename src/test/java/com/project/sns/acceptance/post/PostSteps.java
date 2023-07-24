@@ -41,7 +41,7 @@ public class PostSteps {
                         "Bearer " +
                                 token)
                 .contentType(APPLICATION_JSON_VALUE)
-                .when().get("/api/posts")
+                .when().get("/api/posts/my")
                 .then().log().all().extract();
     }
 
@@ -95,4 +95,13 @@ public class PostSteps {
                 .then().log().all().extract();
     }
 
+    public static ExtractableResponse<Response> 모든_게시물_조회_요청(String token) {
+        return RestAssured.given().log().all()
+                .headers("Authorization",
+                        "Bearer " +
+                                token)
+                .contentType(APPLICATION_JSON_VALUE)
+                .when().get("/api/posts")
+                .then().log().all().extract();
+    }
 }
