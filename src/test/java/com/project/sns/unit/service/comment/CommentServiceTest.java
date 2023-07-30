@@ -48,8 +48,6 @@ class CommentServiceTest {
         String email = "admin@email.com";
         Long postId = 1L;
 
-        Post post = PostFixture.get(email, postId, 1L);
-
         String firstComment = "첫번째 댓글";
 
         when(userRepository.findByEmail(email)).thenReturn(Optional.of(mock(User.class)));

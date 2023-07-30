@@ -69,4 +69,14 @@ public class UserSteps {
                 .when().patch("/api/users/my")
                 .then().log().all().extract();
     }
+
+    public static ExtractableResponse<Response> 알림_조회_기능_요청(String token) {
+        return RestAssured.given().log().all()
+                .headers("Authorization",
+                        "Bearer " +
+                                token)
+                .contentType(APPLICATION_JSON_VALUE)
+                .when().get("/api/users/alarm")
+                .then().log().all().extract();
+    }
 }

@@ -204,14 +204,12 @@ class PostServiceTest {
         Long postId = 1L;
 
         Post post = PostFixture.get(email, postId, 1L);
-        User user = post.getUser();
 
         String anotherEmail = "somin@email.com";
-        User anotherUser = UserFixture.get(anotherEmail, "kkk", 2L);
 
-        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
-        when(postRepository.findById(postId)).thenReturn(Optional.of(post));
-        when(userRepository.findByEmail(anotherEmail)).thenReturn(Optional.of(anotherUser));
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(mock(User.class)));
+        when(postRepository.findById(postId)).thenReturn(Optional.of(mock(Post.class)));
+        when(userRepository.findByEmail(anotherEmail)).thenReturn(Optional.of(mock(User.class)));
 
         assertDoesNotThrow(() -> postService.like(anotherEmail, postId));
     }
