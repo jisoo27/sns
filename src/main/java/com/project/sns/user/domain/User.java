@@ -1,5 +1,6 @@
 package com.project.sns.user.domain;
 
+import com.project.sns.alarm.domain.Alarm;
 import com.project.sns.audit.Auditable;
 import com.project.sns.like.domain.Like;
 import com.project.sns.post.domain.Post;

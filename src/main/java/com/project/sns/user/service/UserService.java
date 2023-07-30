@@ -1,5 +1,7 @@
 package com.project.sns.user.service;
 
+import com.project.sns.alarm.domain.Alarm;
+import com.project.sns.alarm.repository.AlarmRepository;
 import com.project.sns.configuration.JwtTokenUtils;
 import com.project.sns.exception.SnsApplicationException;
 import com.project.sns.user.controller.dto.request.UserEditInfoRequest;
@@ -11,6 +13,8 @@ import com.project.sns.user.domain.User;
 import com.project.sns.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +25,7 @@ import static com.project.sns.exception.ErrorCode.*;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final AlarmRepository alarmRepository;
     private final BCryptPasswordEncoder encoder;
 
     @Value("${jwt.secret-key}")
@@ -67,5 +72,10 @@ public class UserService {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new SnsApplicationException(USER_NOT_FOUND));
         user.editInfo(request.getProfileMessage(), request.getProfileImage(), request.getNickName());
         return UserResponse.of(user);
+    }
+
+    public Page<Alarm> alarmList(String email, Pageable pageable) {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new SnsApplicationException(USER_NOT_FOUND));
+        return alarmRepository.findAllByUser(user, pageable);
     }
 }

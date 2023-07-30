@@ -1,5 +1,9 @@
 package com.project.sns.post.service;
 
+import com.project.sns.alarm.domain.Alarm;
+import com.project.sns.alarm.domain.AlarmArgs;
+import com.project.sns.alarm.domain.AlarmType;
+import com.project.sns.alarm.repository.AlarmRepository;
 import com.project.sns.exception.SnsApplicationException;
 import com.project.sns.image.domain.Image;
 import com.project.sns.like.domain.Like;
@@ -26,6 +30,7 @@ public class PostService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final LikeRepository likeRepository;
+    private final AlarmRepository alarmRepository;
 
 
     @Transactional
@@ -77,6 +82,7 @@ public class PostService {
                 }
         );
         likeRepository.save(Like.of(user, post));
+        alarmRepository.save(Alarm.of(post.getUser(), AlarmType.NEW_LIKE_ON_POST, new AlarmArgs(user.getId(), post.getId())));
     }
 
     @Transactional

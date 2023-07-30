@@ -1,5 +1,6 @@
 package com.project.sns.user.controller;
 
+import com.project.sns.alarm.dto.AlarmResponse;
 import com.project.sns.user.controller.dto.request.UserEditInfoRequest;
 import com.project.sns.user.controller.dto.request.UserJoinRequest;
 import com.project.sns.user.controller.dto.request.UserLoginRequest;
@@ -8,6 +9,8 @@ import com.project.sns.user.controller.dto.response.UserLoginResponse;
 import com.project.sns.user.controller.dto.response.UserResponse;
 import com.project.sns.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -43,5 +46,11 @@ public class UserController {
     public ResponseEntity<UserResponse> editMyInformation(Authentication authentication, @RequestBody UserEditInfoRequest request) {
         UserResponse userResponse = userService.editMyInformation(authentication.getName(), request);
         return ResponseEntity.ok().body(userResponse);
+    }
+
+    @GetMapping("/alarm")
+    public ResponseEntity<Page<AlarmResponse>> alarm(Pageable pageable, Authentication authentication) {
+        Page<AlarmResponse> response = userService.alarmList(authentication.getName(), pageable).map(AlarmResponse::of);
+        return ResponseEntity.ok().body(response);
     }
 }

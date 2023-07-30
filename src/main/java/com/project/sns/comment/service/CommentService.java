@@ -1,5 +1,9 @@
 package com.project.sns.comment.service;
 
+import com.project.sns.alarm.domain.Alarm;
+import com.project.sns.alarm.domain.AlarmArgs;
+import com.project.sns.alarm.domain.AlarmType;
+import com.project.sns.alarm.repository.AlarmRepository;
 import com.project.sns.comment.domain.Comment;
 import com.project.sns.comment.repository.CommentRepository;
 import com.project.sns.exception.SnsApplicationException;
@@ -22,12 +26,14 @@ public class CommentService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
+    private final AlarmRepository alarmRepository;
 
     @Transactional
     public CommentResponse create(Long postId, String email, String content) {
         Post post = postRepository.findById(postId).orElseThrow(() -> new SnsApplicationException(POST_NOT_FOUND));
         User user = userRepository.findByEmail(email).orElseThrow(() -> new SnsApplicationException(USER_NOT_FOUND));
         Comment comment = commentRepository.save(Comment.of(user, post, content));
+        alarmRepository.save(Alarm.of(post.getUser(), AlarmType.NEW_COMMENT_ON_POST, new AlarmArgs(user.getId(), post.getId())));
         return CommentResponse.of(comment, user.getUsername(), postId);
     }
 

@@ -16,7 +16,7 @@ public abstract class Auditable {
     private LocalDateTime registeredAt;
 
     @Column(name = "updated_at")
-    private LocalDateTime updateAt;
+    private LocalDateTime updatedAt;
 
     @Column(name = "delete_at")
     private LocalDateTime deletedAt;
@@ -28,7 +28,7 @@ public abstract class Auditable {
 
     @PreUpdate
     void updatedAt() {
-        this.updateAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
 
 }
