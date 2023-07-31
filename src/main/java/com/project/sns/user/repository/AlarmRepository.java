@@ -1,6 +1,6 @@
-package com.project.sns.alarm.repository;
+package com.project.sns.user.repository;
 
-import com.project.sns.alarm.domain.Alarm;
+import com.project.sns.user.domain.Alarm;
 import com.project.sns.user.domain.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

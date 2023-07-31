@@ -1,8 +1,8 @@
-package com.project.sns.alarm.dto;
+package com.project.sns.user.controller.dto.response;
 
-import com.project.sns.alarm.domain.Alarm;
-import com.project.sns.alarm.domain.AlarmArgs;
-import com.project.sns.alarm.domain.AlarmType;
+import com.project.sns.user.domain.Alarm;
+import com.project.sns.user.domain.AlarmArgs;
+import com.project.sns.user.domain.AlarmType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

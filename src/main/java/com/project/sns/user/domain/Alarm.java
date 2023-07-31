@@ -1,7 +1,6 @@
-package com.project.sns.alarm.domain;
+package com.project.sns.user.domain;
 
 import com.project.sns.audit.Auditable;
-import com.project.sns.user.domain.User;
 import com.vladmihalcea.hibernate.type.json.JsonStringType;
 import lombok.Getter;
 import lombok.Setter;

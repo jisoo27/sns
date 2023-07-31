@@ -1,4 +1,4 @@
-package com.project.sns.alarm.domain;
+package com.project.sns.user.domain;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
