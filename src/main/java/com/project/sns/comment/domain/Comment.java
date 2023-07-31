@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 import javax.persistence.*;
+
+import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
 
 @Entity
@@ -20,18 +22,18 @@ import static javax.persistence.GenerationType.IDENTITY;
 })
 @AllArgsConstructor
 @Builder
-@SQLDelete(sql = "UPDATE comment SET delete_at = NOW() where id = ?")
-@Where(clause = "delete_at is NULL")
+@SQLDelete(sql = "UPDATE comment SET deleted_at = NOW() where id = ?")
+@Where(clause = "deleted_at is NULL")
 public class Comment extends Auditable {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = LAZY)
     private User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = LAZY)
     private Post post;
 
     private String content;

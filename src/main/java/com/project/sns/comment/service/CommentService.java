@@ -1,9 +1,9 @@
 package com.project.sns.comment.service;
 
-import com.project.sns.alarm.domain.Alarm;
-import com.project.sns.alarm.domain.AlarmArgs;
-import com.project.sns.alarm.domain.AlarmType;
-import com.project.sns.alarm.repository.AlarmRepository;
+import com.project.sns.user.domain.Alarm;
+import com.project.sns.user.domain.AlarmArgs;
+import com.project.sns.user.domain.AlarmType;
+import com.project.sns.user.repository.AlarmRepository;
 import com.project.sns.comment.domain.Comment;
 import com.project.sns.comment.repository.CommentRepository;
 import com.project.sns.exception.SnsApplicationException;
@@ -15,7 +15,6 @@ import com.project.sns.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import static com.project.sns.exception.ErrorCode.*;
 import static com.project.sns.exception.ErrorCode.INVALID_PERMISSION;
 

@@ -9,5 +9,5 @@ import lombok.Getter;
 @Getter
 public class PostLikeCountResponse {
 
-    private int count;
+    private long count;
 }

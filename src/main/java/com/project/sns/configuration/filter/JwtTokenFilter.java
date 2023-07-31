@@ -1,6 +1,6 @@
 package com.project.sns.configuration.filter;
 
-import com.project.sns.configuration.JwtTokenUtils;
+import com.project.sns.util.JwtTokenUtils;
 import com.project.sns.user.domain.User;
 import com.project.sns.user.service.UserService;
 import lombok.RequiredArgsConstructor;

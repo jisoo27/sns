@@ -8,8 +8,9 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.Where;
-
 import javax.persistence.*;
+
+import static javax.persistence.FetchType.LAZY;
 
 @Entity
 @TypeDef(name = "json", typeClass = JsonStringType.class)
@@ -18,15 +19,15 @@ import javax.persistence.*;
 })
 @Getter
 @Setter
-@SQLDelete(sql = "UPDATE alarm SET delete_at = NOW() where id = ?")
-@Where(clause = "delete_at is NULL")
+@SQLDelete(sql = "UPDATE alarm SET deleted_at = NOW() where id = ?")
+@Where(clause = "deleted_at is NULL")
 public class Alarm extends Auditable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = LAZY)
     private User user;
 
     @Enumerated(EnumType.STRING)

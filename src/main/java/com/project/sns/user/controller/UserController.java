@@ -1,13 +1,17 @@
 package com.project.sns.user.controller;
 
-import com.project.sns.alarm.dto.AlarmResponse;
+import com.project.sns.exception.ErrorCode;
+import com.project.sns.exception.SnsApplicationException;
+import com.project.sns.user.controller.dto.response.AlarmResponse;
 import com.project.sns.user.controller.dto.request.UserEditInfoRequest;
 import com.project.sns.user.controller.dto.request.UserJoinRequest;
 import com.project.sns.user.controller.dto.request.UserLoginRequest;
 import com.project.sns.user.controller.dto.response.UserJoinResponse;
 import com.project.sns.user.controller.dto.response.UserLoginResponse;
 import com.project.sns.user.controller.dto.response.UserResponse;
+import com.project.sns.user.domain.User;
 import com.project.sns.user.service.UserService;
+import com.project.sns.util.ClassUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -50,7 +54,8 @@ public class UserController {
 
     @GetMapping("/alarm")
     public ResponseEntity<Page<AlarmResponse>> alarm(Pageable pageable, Authentication authentication) {
-        Page<AlarmResponse> response = userService.alarmList(authentication.getName(), pageable).map(AlarmResponse::of);
+        User user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), User.class).orElseThrow(() -> new SnsApplicationException(ErrorCode.INTERNAL_SERVER_ERROR));
+        Page<AlarmResponse> response = userService.alarmList(user.getId(), pageable).map(AlarmResponse::of);
         return ResponseEntity.ok().body(response);
     }
 }

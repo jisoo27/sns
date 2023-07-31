@@ -13,8 +13,8 @@ import static lombok.AccessLevel.PROTECTED;
 
 @Entity(name = "likes")
 @Getter
-@SQLDelete(sql = "UPDATE likes SET delete_at = NOW() where id = ?")
-@Where(clause = "delete_at is NULL")
+@SQLDelete(sql = "UPDATE likes SET deleted_at = NOW() where id = ?")
+@Where(clause = "deleted_at is NULL")
 @AllArgsConstructor
 @Builder
 @NoArgsConstructor(access = PROTECTED)

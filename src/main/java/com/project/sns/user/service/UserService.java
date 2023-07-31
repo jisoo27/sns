@@ -1,8 +1,8 @@
 package com.project.sns.user.service;
 
-import com.project.sns.alarm.domain.Alarm;
-import com.project.sns.alarm.repository.AlarmRepository;
-import com.project.sns.configuration.JwtTokenUtils;
+import com.project.sns.user.domain.Alarm;
+import com.project.sns.user.repository.AlarmRepository;
+import com.project.sns.util.JwtTokenUtils;
 import com.project.sns.exception.SnsApplicationException;
 import com.project.sns.user.controller.dto.request.UserEditInfoRequest;
 import com.project.sns.user.controller.dto.request.UserJoinRequest;
@@ -73,9 +73,8 @@ public class UserService {
         return UserResponse.of(user);
     }
 
-    public Page<Alarm> alarmList(String email, Pageable pageable) {
-        User user = getUserOrException(email);
-        return alarmRepository.findAllByUser(user, pageable);
+    public Page<Alarm> alarmList(Long userId, Pageable pageable) {
+        return alarmRepository.findAllByUserId(userId, pageable);
     }
 
     private User getUserOrException(String email) {

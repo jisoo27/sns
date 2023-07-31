@@ -1,6 +1,5 @@
 package com.project.sns.user.domain;
 
-import com.project.sns.alarm.domain.Alarm;
 import com.project.sns.audit.Auditable;
 import com.project.sns.like.domain.Like;
 import com.project.sns.post.domain.Post;
@@ -22,8 +21,8 @@ import static lombok.AccessLevel.PROTECTED;
 
 @Entity(name = "users")
 @Getter
-@SQLDelete(sql = "UPDATE users SET delete_at = NOW() where id = ?")
-@Where(clause = "delete_at is NULL")
+@SQLDelete(sql = "UPDATE users SET deleted_at = NOW() where id = ?")
+@Where(clause = "deleted_at is NULL")
 @AllArgsConstructor
 @Builder
 @NoArgsConstructor(access = PROTECTED)

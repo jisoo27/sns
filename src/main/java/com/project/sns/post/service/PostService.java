@@ -1,9 +1,10 @@
 package com.project.sns.post.service;
 
-import com.project.sns.alarm.domain.Alarm;
-import com.project.sns.alarm.domain.AlarmArgs;
-import com.project.sns.alarm.domain.AlarmType;
-import com.project.sns.alarm.repository.AlarmRepository;
+import com.project.sns.comment.repository.CommentRepository;
+import com.project.sns.user.domain.Alarm;
+import com.project.sns.user.domain.AlarmArgs;
+import com.project.sns.user.domain.AlarmType;
+import com.project.sns.user.repository.AlarmRepository;
 import com.project.sns.exception.SnsApplicationException;
 import com.project.sns.image.domain.Image;
 import com.project.sns.like.domain.Like;
@@ -28,6 +29,7 @@ import static com.project.sns.exception.ErrorCode.*;
 public class PostService {
 
     private final UserRepository userRepository;
+    private final CommentRepository commentRepository;
     private final PostRepository postRepository;
     private final LikeRepository likeRepository;
     private final AlarmRepository alarmRepository;
@@ -68,6 +70,8 @@ public class PostService {
         if (post.notCheckUser(user)) {
             throw new SnsApplicationException(INVALID_PERMISSION);
         }
+        likeRepository.deleteAllByPost(post);
+        commentRepository.deleteAllByPost(post);
         postRepository.delete(post);
     }
 
@@ -100,7 +104,7 @@ public class PostService {
 
     public PostLikeCountResponse getLikeCount(Long postId) {
         Post post = getPostOrException(postId);
-        Integer count = likeRepository.countByPost(post);
+        long count = likeRepository.countByPost(post);
         return PostLikeCountResponse.builder().count(count).build();
     }
 

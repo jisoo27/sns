@@ -19,8 +19,8 @@ import static lombok.AccessLevel.PROTECTED;
 
 @Entity(name = "post")
 @Getter
-@SQLDelete(sql = "UPDATE post SET delete_at = NOW() where id = ?")
-@Where(clause = "delete_at is NULL")
+@SQLDelete(sql = "UPDATE post SET deleted_at = NOW() where id = ?")
+@Where(clause = "deleted_at is NULL")
 @AllArgsConstructor
 @Builder
 @NoArgsConstructor(access = PROTECTED)
