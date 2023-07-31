@@ -35,7 +35,7 @@ public class PostService {
 
     @Transactional
     public PostResponse create(List<String> imagePaths, String content, String email) {
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new SnsApplicationException(USER_NOT_FOUND));
+        User user = getUserOrException(email);
         Post post = new Post(content, user);
         for (String imagePath : imagePaths) {
             Image image = Image.of(imagePath, post);
@@ -47,8 +47,8 @@ public class PostService {
 
     @Transactional
     public PostEditResponse edit(String content, String email, Long postId) {
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new SnsApplicationException(USER_NOT_FOUND));
-        Post post = postRepository.findById(postId).orElseThrow(() -> new SnsApplicationException(POST_NOT_FOUND));
+        User user = getUserOrException(email);
+        Post post = getPostOrException(postId);
 
         if (post.notCheckUser(user)) {
             throw new SnsApplicationException(INVALID_PERMISSION);
@@ -58,13 +58,13 @@ public class PostService {
     }
 
     public Page<PostResponse> getMyList(String email, Pageable pageable) {
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new SnsApplicationException(USER_NOT_FOUND));
+        User user = getUserOrException(email);
         return postRepository.findAllByUser(user, pageable).map(PostResponse::of);
     }
 
     public void delete(String email, Long postId) {
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new SnsApplicationException(USER_NOT_FOUND));
-        Post post = postRepository.findById(postId).orElseThrow(() -> new SnsApplicationException(POST_NOT_FOUND));
+        User user = getUserOrException(email);
+        Post post = getPostOrException(postId);
         if (post.notCheckUser(user)) {
             throw new SnsApplicationException(INVALID_PERMISSION);
         }
@@ -73,8 +73,8 @@ public class PostService {
 
     @Transactional
     public void like(String email, Long postId) {
-        Post post = postRepository.findById(postId).orElseThrow(() -> new SnsApplicationException(POST_NOT_FOUND));
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new SnsApplicationException(USER_NOT_FOUND));
+        Post post = getPostOrException(postId);
+        User user = getUserOrException(email);
 
         likeRepository.findByUserAndPost(user, post).ifPresent(
                 it -> {
@@ -87,30 +87,40 @@ public class PostService {
 
     @Transactional
     public void notLike(String email, Long postId) {
-        Post post = postRepository.findById(postId).orElseThrow(() -> new SnsApplicationException(POST_NOT_FOUND));
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new SnsApplicationException(USER_NOT_FOUND));
+        Post post = getPostOrException(postId);
+        User user = getUserOrException(email);
         Like like = likeRepository.findByUserAndPost(user, post).orElseThrow(() -> new SnsApplicationException(LIKE_NOT_FOUND));
         likeRepository.delete(like);
     }
 
     public Page<PostResponse> getMyLikeList(String email, Pageable pageable) {
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new SnsApplicationException(USER_NOT_FOUND));
+        User user = getUserOrException(email);
         return likeRepository.findAllByUser(user, pageable).map(like -> PostResponse.of(like.getPost()));
     }
 
     public PostLikeCountResponse getLikeCount(Long postId) {
-        Post post = postRepository.findById(postId).orElseThrow(() -> new SnsApplicationException(POST_NOT_FOUND));
+        Post post = getPostOrException(postId);
         Integer count = likeRepository.countByPost(post);
         return PostLikeCountResponse.builder().count(count).build();
     }
 
     public Page<PostResponse> getAllList(String email, Pageable pageable) {
-        userRepository.findByEmail(email).orElseThrow(() -> new SnsApplicationException(USER_NOT_FOUND));
+        getUserOrException(email);
         return postRepository.findAll(pageable).map(PostResponse::of);
     }
 
     public Page<PostResponse> getAgeFilterList(String email, int low, int high, Pageable pageable) {
-        userRepository.findByEmail(email).orElseThrow(() -> new SnsApplicationException(USER_NOT_FOUND));
+        getUserOrException(email);
         return postRepository.findAllByAge(pageable, low, high).map(PostResponse::of);
+    }
+
+    private Post getPostOrException(Long postId) {
+        return postRepository.findById(postId).orElseThrow(
+                () -> new SnsApplicationException(POST_NOT_FOUND)
+        );
+    }
+
+    private User getUserOrException(String email) {
+        return userRepository.findByEmail(email).orElseThrow(() -> new SnsApplicationException(USER_NOT_FOUND));
     }
 }

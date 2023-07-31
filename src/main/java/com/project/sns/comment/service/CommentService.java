@@ -30,8 +30,8 @@ public class CommentService {
 
     @Transactional
     public CommentResponse create(Long postId, String email, String content) {
-        Post post = postRepository.findById(postId).orElseThrow(() -> new SnsApplicationException(POST_NOT_FOUND));
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new SnsApplicationException(USER_NOT_FOUND));
+        Post post = getPostOrException(postId);
+        User user = getUserOrException(email);
         Comment comment = commentRepository.save(Comment.of(user, post, content));
         alarmRepository.save(Alarm.of(post.getUser(), AlarmType.NEW_COMMENT_ON_POST, new AlarmArgs(user.getId(), post.getId())));
         return CommentResponse.of(comment, user.getUsername(), postId);
@@ -39,9 +39,9 @@ public class CommentService {
 
     @Transactional
     public CommentResponse edit(Long postId, Long commentId, String editContent, String email) {
-        postRepository.findById(postId).orElseThrow(() -> new SnsApplicationException(POST_NOT_FOUND));
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new SnsApplicationException(USER_NOT_FOUND));
-        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new SnsApplicationException(COMMENT_NOT_FOUND));
+        getPostOrException(postId);
+        User user = getUserOrException(email);
+        Comment comment = getCommentOrException(commentId);
         if (comment.isCheckUser(user)) {
             throw new SnsApplicationException(INVALID_PERMISSION);
         }
@@ -50,12 +50,24 @@ public class CommentService {
     }
 
     public void delete(Long postId, Long commentId, String email) {
-        postRepository.findById(postId).orElseThrow(() -> new SnsApplicationException(POST_NOT_FOUND));
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new SnsApplicationException(USER_NOT_FOUND));
-        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new SnsApplicationException(COMMENT_NOT_FOUND));
+        getPostOrException(postId);
+        User user = getUserOrException(email);
+        Comment comment = getCommentOrException(commentId);
         if (comment.isCheckUser(user)) {
             throw new SnsApplicationException(INVALID_PERMISSION);
         }
         commentRepository.delete(comment);
+    }
+
+    private Post getPostOrException(Long postId) {
+        return postRepository.findById(postId).orElseThrow(() -> new SnsApplicationException(POST_NOT_FOUND));
+    }
+
+    private User getUserOrException(String email) {
+        return userRepository.findByEmail(email).orElseThrow(() -> new SnsApplicationException(USER_NOT_FOUND));
+    }
+
+    private Comment getCommentOrException(Long commentId) {
+        return commentRepository.findById(commentId).orElseThrow(() -> new SnsApplicationException(COMMENT_NOT_FOUND));
     }
 }

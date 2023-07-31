@@ -36,7 +36,6 @@ public class UserService {
 
     @Transactional
     public UserJoinResponse join(UserJoinRequest userJoinRequest) {
-
         userRepository.findByEmail(userJoinRequest.getEmail()).ifPresent(it -> {
             throw new SnsApplicationException(DUPLICATED_USER_EMAIL);
         });
@@ -49,7 +48,7 @@ public class UserService {
 
     public UserLoginResponse login(String email, String password) {
 
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new SnsApplicationException(USER_NOT_FOUND));
+        User user = getUserOrException(email);
         if (!encoder.matches(password, user.getPassword())) {
             throw new SnsApplicationException(INVALID_PASSWORD);
         }
@@ -59,23 +58,27 @@ public class UserService {
     }
 
     public UserResponse getMyInformation(String email) {
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new SnsApplicationException(USER_NOT_FOUND));
+        User user = getUserOrException(email);
         return UserResponse.of(user);
     }
 
     public User loadUserByEmail(String email) {
-        return userRepository.findByEmail(email).orElseThrow(() -> new SnsApplicationException(USER_NOT_FOUND));
+        return getUserOrException(email);
     }
 
     @Transactional
     public UserResponse editMyInformation(String email, UserEditInfoRequest request) {
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new SnsApplicationException(USER_NOT_FOUND));
+        User user = getUserOrException(email);
         user.editInfo(request.getProfileMessage(), request.getProfileImage(), request.getNickName());
         return UserResponse.of(user);
     }
 
     public Page<Alarm> alarmList(String email, Pageable pageable) {
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new SnsApplicationException(USER_NOT_FOUND));
+        User user = getUserOrException(email);
         return alarmRepository.findAllByUser(user, pageable);
+    }
+
+    private User getUserOrException(String email) {
+        return userRepository.findByEmail(email).orElseThrow(() -> new SnsApplicationException(USER_NOT_FOUND));
     }
 }
