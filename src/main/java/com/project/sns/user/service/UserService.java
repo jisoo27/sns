@@ -2,6 +2,7 @@ package com.project.sns.user.service;
 
 import com.project.sns.user.domain.Alarm;
 import com.project.sns.user.repository.AlarmRepository;
+import com.project.sns.user.repository.UserCacheRepository;
 import com.project.sns.util.JwtTokenUtils;
 import com.project.sns.exception.SnsApplicationException;
 import com.project.sns.user.controller.dto.request.UserEditInfoRequest;
@@ -27,6 +28,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final AlarmRepository alarmRepository;
     private final BCryptPasswordEncoder encoder;
+    private final UserCacheRepository userCacheRepository;
 
     @Value("${jwt.secret-key}")
     private String secretKey;
@@ -47,8 +49,9 @@ public class UserService {
     }
 
     public UserLoginResponse login(String email, String password) {
+        User user = loadUserByEmail(email);
+        userCacheRepository.setUser(user);
 
-        User user = getUserOrException(email);
         if (!encoder.matches(password, user.getPassword())) {
             throw new SnsApplicationException(INVALID_PASSWORD);
         }
@@ -63,7 +66,7 @@ public class UserService {
     }
 
     public User loadUserByEmail(String email) {
-        return getUserOrException(email);
+        return userCacheRepository.getUser(email).orElseGet(() -> getUserOrException(email));
     }
 
     @Transactional

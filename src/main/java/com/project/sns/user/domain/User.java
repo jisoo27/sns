@@ -1,12 +1,11 @@
 package com.project.sns.user.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.project.sns.audit.Auditable;
 import com.project.sns.like.domain.Like;
 import com.project.sns.post.domain.Post;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 import org.springframework.security.core.GrantedAuthority;
@@ -20,12 +19,14 @@ import static javax.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
 @Entity(name = "users")
+@ToString
 @Getter
 @SQLDelete(sql = "UPDATE users SET deleted_at = NOW() where id = ?")
 @Where(clause = "deleted_at is NULL")
 @AllArgsConstructor
 @Builder
 @NoArgsConstructor(access = PROTECTED)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class User extends Auditable implements UserDetails {
 
     @Id
@@ -80,31 +81,37 @@ public class User extends Auditable implements UserDetails {
     }
 
     @Override
+    @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(this.getRole().toString()));
     }
 
     @Override
+    @JsonIgnore
     public String getUsername() {
         return this.email;
     }
 
     @Override
+    @JsonIgnore
     public boolean isAccountNonExpired() {
         return this.getDeletedAt() == null;
     }
 
     @Override
+    @JsonIgnore
     public boolean isAccountNonLocked() {
         return this.getDeletedAt() == null;
     }
 
     @Override
+    @JsonIgnore
     public boolean isCredentialsNonExpired() {
         return this.getDeletedAt() == null;
     }
 
     @Override
+    @JsonIgnore
     public boolean isEnabled() {
         return this.getDeletedAt() == null;
     }
