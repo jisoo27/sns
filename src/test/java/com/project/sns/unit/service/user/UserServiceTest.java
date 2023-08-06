@@ -1,15 +1,21 @@
 package com.project.sns.unit.service.user;
 
 import com.project.sns.exception.SnsApplicationException;
+import com.project.sns.fixture.PostFixture;
+import com.project.sns.post.domain.Post;
 import com.project.sns.unit.UnitTest;
 import com.project.sns.user.controller.dto.request.UserEditInfoRequest;
 import com.project.sns.user.domain.User;
+import com.project.sns.user.repository.AlarmRepository;
 import com.project.sns.user.repository.UserRepository;
 import com.project.sns.user.service.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import java.util.Optional;
 import static com.project.sns.exception.ErrorCode.USER_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,6 +31,9 @@ class UserServiceTest extends UnitTest {
 
     @MockBean
     private UserRepository userRepository;
+
+    @MockBean
+    private AlarmRepository alarmRepository;
 
     private final String EMAIL = "admin@email.com";
 
@@ -61,6 +70,38 @@ class UserServiceTest extends UnitTest {
         when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.empty());
         SnsApplicationException e = assertThrows(SnsApplicationException.class, () -> userService.editMyInformation(EMAIL, new UserEditInfoRequest("hi", "//", "sona")));
         assertThat(e.getErrorCode()).isEqualTo(USER_NOT_FOUND);
+    }
+
+    @Test
+    @DisplayName("댓글 알림 조회 요청에 성공할 경우")
+    void getCommentAlarmListTest() {
+
+        Long postId = 1L;
+        Post post = PostFixture.get(EMAIL, postId, 1L);
+        User user = post.getUser();
+
+        Pageable pageable = mock(Pageable.class);
+
+        when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(user));
+        when(alarmRepository.findAllByUserId(1L, pageable)).thenReturn(Page.empty());
+
+        assertDoesNotThrow(() -> userService.getAlarmList(1L, pageable));
+    }
+
+    @Test
+    @DisplayName("좋아요 알림 조회 요청에 성공할 경우")
+    void getLikeAlarmListTest() {
+
+        Long postId = 1L;
+        Post post = PostFixture.get(EMAIL, postId, 1L);
+        User user = post.getUser();
+
+        Pageable pageable = mock(Pageable.class);
+
+        when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(user));
+        when(alarmRepository.findAllByUserId(1L, pageable)).thenReturn(Page.empty());
+
+        assertDoesNotThrow(() -> userService.getAlarmList(1L, pageable));
     }
 
 }

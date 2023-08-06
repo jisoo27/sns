@@ -76,7 +76,7 @@ public class UserService {
         return UserResponse.of(user);
     }
 
-    public Page<Alarm> alarmList(Long userId, Pageable pageable) {
+    public Page<Alarm> getAlarmList(Long userId, Pageable pageable) {
         return alarmRepository.findAllByUserId(userId, pageable);
     }
 

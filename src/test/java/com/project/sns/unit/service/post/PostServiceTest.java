@@ -17,7 +17,6 @@ import com.project.sns.user.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -203,8 +202,6 @@ class PostServiceTest extends UnitTest {
         String email = "admin@email.com";
         Long postId = 1L;
 
-        Post post = PostFixture.get(email, postId, 1L);
-
         String anotherEmail = "somin@email.com";
 
         when(userRepository.findByEmail(email)).thenReturn(Optional.of(mock(User.class)));
@@ -324,7 +321,6 @@ class PostServiceTest extends UnitTest {
         assertThat(e.getErrorCode()).isEqualTo(LIKE_NOT_FOUND);
     }
 
-    // TODO : 조금 더 생각해보기
     @DisplayName("자신이 좋아요 한 글 조회 요청 시 성공한 경우")
     @Test
     void getMyLikePostTest() {
@@ -336,7 +332,11 @@ class PostServiceTest extends UnitTest {
         Post post = PostFixture.get(email, postId, 1L);
         User user = post.getUser();
 
+        Long likeId = 1L;
+        Like like = LikeFixture.get(email, postId, 1L, likeId);
+
         when(userRepository.findByEmail(any())).thenReturn(Optional.of(user));
+        when(likeRepository.findById(likeId)).thenReturn(Optional.of(like));
         when(likeRepository.findAllByUser(user, pageable)).thenReturn(Page.empty());
 
         assertDoesNotThrow(() -> postService.getMyLikeList(user.getEmail(), pageable));

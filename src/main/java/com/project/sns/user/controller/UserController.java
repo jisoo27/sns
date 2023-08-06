@@ -54,7 +54,7 @@ public class UserController {
     @GetMapping("/alarm")
     public ResponseEntity<Page<AlarmResponse>> alarm(Pageable pageable, Authentication authentication) {
         User user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), User.class).orElseThrow(() -> new SnsApplicationException(ErrorCode.INTERNAL_SERVER_ERROR));
-        Page<AlarmResponse> response = userService.alarmList(user.getId(), pageable).map(AlarmResponse::of);
+        Page<AlarmResponse> response = userService.getAlarmList(user.getId(), pageable).map(AlarmResponse::of);
         return ResponseEntity.ok().body(response);
     }
 }
