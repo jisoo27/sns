@@ -156,7 +156,10 @@ class PostAcceptanceTest extends AcceptanceTest {
         var 유효한_토큰 = 베어러_인증_응답에서_token_가져오기(로그인_요청);
         var 게시물_id = 게시물_등록_요청(유효한_토큰, new PostCreateRequest(List.of("//", "ss"), "내용이다.")).jsonPath().getLong("id");
 
-        var 다른_로그인_요청 = 베어러_인증_로그인_요청("anotherAdmin@email.com", "kkk");
+        String anotherEmail = "anotherAdmin@email.com";
+        String anotherPassword = "kkk";
+        회원가입_요청(27, anotherEmail, anotherPassword, "userName", "nickName", "address", "hi", "/");
+        var 다른_로그인_요청 = 베어러_인증_로그인_요청(anotherEmail, anotherPassword);
         var 다른_유효한_토큰 = 베어러_인증_응답에서_token_가져오기(다른_로그인_요청);
 
         // when

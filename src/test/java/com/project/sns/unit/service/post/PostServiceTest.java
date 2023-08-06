@@ -11,6 +11,7 @@ import com.project.sns.like.repository.LikeRepository;
 import com.project.sns.post.domain.Post;
 import com.project.sns.post.repository.PostRepository;
 import com.project.sns.post.service.PostService;
+import com.project.sns.unit.UnitTest;
 import com.project.sns.user.domain.User;
 import com.project.sns.user.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -30,8 +31,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
-class PostServiceTest {
+class PostServiceTest extends UnitTest {
 
     @Autowired
     private PostService postService;

@@ -29,7 +29,6 @@ public class UserController {
 
     @PostMapping("/signup")
     public ResponseEntity<UserJoinResponse> join(@RequestBody UserJoinRequest request) {
-        // TODO: 컨트롤러에서 받는 요청 dto 를 그대로 service layer 에 보내지 말것.
         UserJoinResponse response = userService.join(request);
         return ResponseEntity.created(URI.create("/users/" + response.getId())).body(response);
     }
