@@ -70,4 +70,33 @@ class AuthAcceptanceTest extends AcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(UNAUTHORIZED.value());
     }
 
+    @DisplayName("회원 탈퇴를 할 수 있다.")
+    @Test
+    void withdrawalTest() {
+
+        회원가입_요청(22, EMAIL, PASSWORD, "admin", "admmin", "경기도 수원시", "안녕", "/");
+
+        var 유효한_토큰 = 베어러_인증_로그인_요청(EMAIL, PASSWORD);
+        var token = 베어러_인증_응답에서_token_가져오기(유효한_토큰);
+
+        var response = 회원_탈퇴_요청(token);
+
+        assertThat(response.statusCode()).isEqualTo(NO_CONTENT.value());
+    }
+
+    @DisplayName("회원 탈퇴를 한 경우 로그인에 실패한다.")
+    @Test
+    void loginExceptionTest3() {
+
+        회원가입_요청(22, EMAIL, PASSWORD, "admin", "admmin", "경기도 수원시", "안녕", "/");
+
+        var 유효한_토큰 = 베어러_인증_로그인_요청(EMAIL, PASSWORD);
+        var token = 베어러_인증_응답에서_token_가져오기(유효한_토큰);
+        회원_탈퇴_요청(token);
+
+        var response = 베어러_인증_로그인_요청(EMAIL, PASSWORD);
+
+        assertThat(response.statusCode()).isEqualTo(NOT_FOUND.value());
+    }
+
 }
