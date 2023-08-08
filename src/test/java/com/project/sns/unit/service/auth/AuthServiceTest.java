@@ -115,4 +115,15 @@ class AuthServiceTest extends UnitTest {
         SnsApplicationException e = assertThrows(SnsApplicationException.class, () -> userService.login(USER_JOIN_REQUEST.getEmail(), "wrong_password"));
         assertThat(e.getErrorCode()).isEqualTo(ErrorCode.INVALID_PASSWORD);
     }
+
+    @Test
+    @DisplayName("회원 탈퇴가 정상적으로 동작하는 경우")
+    void withdrawalTest() {
+
+        User fixture = UserFixture.get(USER_JOIN_REQUEST);
+
+        when(userRepository.findByEmail(USER_JOIN_REQUEST.getEmail())).thenReturn(Optional.of(fixture));
+
+        assertDoesNotThrow(() -> userService.delete(USER_JOIN_REQUEST.getEmail()));
+    }
 }
