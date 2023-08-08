@@ -83,4 +83,11 @@ public class UserService {
     private User getUserOrException(String email) {
         return userRepository.findByEmail(email).orElseThrow(() -> new SnsApplicationException(USER_NOT_FOUND));
     }
+
+    @Transactional
+    public void delete(String email) {
+        User user = getUserOrException(email);
+        userRepository.delete(user);
+        userCacheRepository.deleteUser(user);
+    }
 }

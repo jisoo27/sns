@@ -51,6 +51,12 @@ public class UserController {
         return ResponseEntity.ok().body(userResponse);
     }
 
+    @DeleteMapping
+    public ResponseEntity<Void> delete(Authentication authentication) {
+        userService.delete(authentication.getName());
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/alarm")
     public ResponseEntity<Page<AlarmResponse>> alarm(Pageable pageable, Authentication authentication) {
         User user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), User.class).orElseThrow(() -> new SnsApplicationException(ErrorCode.INTERNAL_SERVER_ERROR));

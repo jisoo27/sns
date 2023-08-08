@@ -3,6 +3,7 @@ package com.project.sns.user.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.project.sns.audit.Auditable;
+import com.project.sns.comment.domain.Comment;
 import com.project.sns.like.domain.Like;
 import com.project.sns.post.domain.Post;
 import lombok.*;
@@ -15,6 +16,7 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
@@ -53,10 +55,13 @@ public class User extends Auditable implements UserDetails {
     @Enumerated(EnumType.STRING)
     private final UserRole role = UserRole.USER;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = ALL)
+    private List<Comment> comments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = ALL)
     private List<Post> posts = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = ALL)
     private List<Like> likes = new ArrayList<>();
 
 

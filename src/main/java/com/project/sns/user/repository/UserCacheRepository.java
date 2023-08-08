@@ -37,4 +37,9 @@ public class UserCacheRepository {
         //Redis에서 key 값을 구성할때는 prefix 를 붙여주는 것이 좋다.
         return "USER:" + email;
     }
+
+    public void deleteUser(User user) {
+        String key = getKey(user.getEmail());
+        userRedisTemplate.delete(key);
+    }
 }
