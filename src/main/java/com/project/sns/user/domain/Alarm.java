@@ -9,7 +9,6 @@ import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.Where;
 import javax.persistence.*;
-
 import static javax.persistence.FetchType.LAZY;
 
 @Entity

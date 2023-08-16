@@ -80,5 +80,4 @@ public class PostController {
         PostLikeCountResponse response = postService.getLikeCount(postId);
         return ResponseEntity.ok().body(response);
     }
-
 }

@@ -2,13 +2,10 @@ package com.project.sns.acceptance.user;
 
 import com.project.sns.acceptance.AcceptanceTest;
 import com.project.sns.post.controller.dto.request.PostCreateRequest;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
 import java.util.List;
-
 import static com.project.sns.acceptance.comment.CommentSteps.댓글_생성_요청;
 import static com.project.sns.acceptance.post.PostSteps.게시물_등록_요청;
 import static com.project.sns.acceptance.post.PostSteps.게시물_좋아요_누르기_요청;
