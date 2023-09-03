@@ -19,7 +19,7 @@ Spring Boot, Java, Gradle, MySQL, Redis, Spring JPA, Spring Security
 
 
 ### ✔️ ERD 작성
-<img width="650" alt="스크린샷 2023-08-26 오전 10 50 26" src="https://github.com/jisoo27/sns/assets/94853413/b1f87634-9e87-4b88-ad36-dfe90d7209c6">
+<img width="650" alt="스크린샷 2023-08-26 오전 10 50 26" src="https://github.com/jisoo27/sns/assets/94853413/fa06da48-2277-4a59-9ece-a2842565b4fe">
 
 
 <br>
